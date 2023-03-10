@@ -1,0 +1,14 @@
+{
+  "pricing_table": "Preistabellen",
+  "basic": "Basic",
+  "pro": "Profi",
+  "premium": "Prämie",
+  "storage": "Lager",
+  "email": "E-Mails",
+  "domain": "Domänen",
+  "sign_up": "Anmelden",
+  "cost_basic": "€ 9",
+  "cost_pro": "€ 22.5",
+  "cost_premium": "€ 45",
+  "per_month": "pro Monat"
+}
