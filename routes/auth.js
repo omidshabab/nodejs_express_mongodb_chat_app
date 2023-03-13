@@ -26,11 +26,13 @@ router.post("/validate/email", loginUsername);
 router.post("/validate/phone", loginUsername);
 router.post("/validate/token", loginUsername);
 
+/* OTP */
+router.post("/otp/send", sendOTP);
+router.post("/otp/verify", verifyOTP);
+
 /* SIGNUP */
 router.post("/signup/email", signupEmail);
 router.post("/signup/phone", signupPhone);
-router.post("/send-otp", sendOTP);
-router.post("/verify-otp", verifyOTP);
 router.post("/signup/google", signupGoogle);
 router.post("/signup/wallet", signupWallet);
 

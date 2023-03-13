@@ -25,9 +25,9 @@ const router = express.Router();
 router.post("/:userId", createUserToken);
 
 /* READ */
-router.get("/:userId", getUser);
+router.get("/:username", getUser);
 router.get("/:userId/verify/:token", getUserToken);
-router.get("/:userId/followers", getUserFollowers);
+router.get("/followers/:userId", getUserFollowers);
 router.get("/:userId/followings", getUserFollowings);
 router.get("/:userId/coupons", getUserCoupons);
 router.get("/:userId/links", getUserLinks);
@@ -38,7 +38,7 @@ router.get("/search/:key", searchUsers);
 router.get("/username/:username", checkUsername);
 
 /* UPDATE */
-router.put("/:userId/follow/:id", verifyToken, followUser);
+router.put("/:userId/follow/:myId", verifyToken, followUser);
 router.put("/:userId/unfollow/:id", verifyToken, unfollowUser);
 router.put("/:userId", verifyToken, updateUser);
 

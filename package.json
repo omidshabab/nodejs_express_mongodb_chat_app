@@ -28,7 +28,7 @@
     "openai": "^3.2.1",
     "pm2": "^5.2.2",
     "socket.io": "^4.5.4",
-    "stripe": "^11.7.0",
+    "stripe": "^11.14.0",
     "twilio": "^3.84.1",
     "unique-username-generator": "^1.1.3"
   },

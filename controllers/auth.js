@@ -5,6 +5,7 @@ const {
   generateFromEmail,
   generateUsername,
 } = require("unique-username-generator");
+const { verifyOTP } = require("../utils/sms.js");
 
 /* SIGNUP */
 const signupEmail = async (req, res) => {
@@ -66,21 +67,28 @@ const signupPhone = async (req, res) => {
         error_code: "required fields",
       });
 
-    const username = generateUsername();
+    if (verifyOTP) {
+      const username = generateUsername();
 
-    const user = User({
-      username,
-      phone,
-    });
-    await user.save();
-    res.status(201).json({
-      status: "success",
-      data: {
-        username: user.username,
-        phone: user.phone,
-        desc: user.desc,
-      },
-    });
+      const user = User({
+        username,
+        phone: countryCode + phoneNumber,
+      });
+      await user.save();
+      res.status(201).json({
+        status: "success",
+        data: {
+          username: user.username,
+          phone: user.phone,
+          desc: user.desc,
+        },
+      });
+    } else {
+      res.status(500).json({
+        status: "failed",
+        data: "verify you phone",
+      });
+    }
   } catch (err) {
     res.status(500).json({
       status: "failed",

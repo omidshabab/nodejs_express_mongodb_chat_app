@@ -38,7 +38,7 @@ const createUserToken = async (req, res) => {
 const getUser = async (req, res) => {
   try {
     const { username } = req.params;
-    const user = await User.findOne(username);
+    const user = await User.findOne({ username });
 
     if (user) {
       res.status(200).json({
@@ -59,7 +59,7 @@ const getUser = async (req, res) => {
     }
   } catch (err) {
     res.status(500).json({
-      status: STATUS.Failed,
+      status: "failed",
       data: err.message,
     });
   }
@@ -161,15 +161,16 @@ const getUserNotifications = async (req, res) => {
 
 const getUserFollowers = async (req, res) => {
   try {
-    const currentUser = await User.findById(req.params.userId);
+    const { userId } = req.params;
+    const currentUser = await User.findById(userId);
+
+    // if (currentUser) return res.status(200).json("success");
 
     // Number of followers
-    User.countDocuments({ _id: currentUser.followers }, async (err, count) => {
-      if (err) {
-        res.status(500).json({ error: err.message });
-      } else {
+    User.countDocuments({ id: currentUser.followers }, async (err, count) => {
+      try {
         // Query for followers
-        const query = { _id: currentUser.followers };
+        const query = { id: currentUser.followers };
 
         const userFollowers = await User.find(query).sort({
           $natural: -1,
@@ -183,11 +184,16 @@ const getUserFollowers = async (req, res) => {
             followers: userFollowers,
           });
         }
+      } catch (err) {
+        res.status(500).json({
+          status: "failed",
+          data: err.message,
+        });
       }
     });
   } catch (err) {
     res.status(500).json({
-      status: STATUS.Failed,
+      status: "failed",
       data: err.message,
     });
   }
@@ -301,14 +307,14 @@ const checkUsername = async (req, res) => {
 
 /* UPDATE */
 const followUser = async (req, res) => {
-  const { id, userId } = req.params;
+  const { myId, userId } = req.params;
   if (userId !== id) {
     try {
-      const user = await User.findById({ _id: id });
+      const user = await User.findById({ _id: myId });
       const currentUser = await User.findById({ _id: userId });
       if (!user.followers.includes(userId)) {
         await user.updateOne({ $push: { followers: userId } });
-        await currentUser.updateOne({ $push: { followings: id } });
+        await currentUser.updateOne({ $push: { followings: myId } });
         res.status(200).json("User has been followed");
       } else {
         res.status(403).json("You already followed this account");
