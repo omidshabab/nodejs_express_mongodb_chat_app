@@ -29,7 +29,7 @@ const verifyToken = async (req, res, next) => {
     next();
   } catch (err) {
     res.status(500).json({
-      status: STATUS.Failed,
+      status: "failed",
       data: err.message,
     });
   }
@@ -41,7 +41,7 @@ const verifyUsername = async (req, res, next) => {
     next();
   } catch (err) {
     res.status(500).json({
-      status: STATUS.Failed,
+      status: "failed",
       data: err.message,
     });
   }

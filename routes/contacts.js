@@ -11,16 +11,15 @@ const {
 const router = express.Router();
 
 /* CREATE */
-router.post("/create", verifyToken, createContact);
-router.post("/add", verifyToken, addContacts);
+router.post("/:userId", verifyToken, createContact);
 
 /* READ */
-router.get("/get", verifyToken, getContacts);
+router.get("/:userId", verifyToken, getContacts);
 
 /* UPDATE */
-router.put("/update", verifyToken, updateContact);
+router.put("/:userId", verifyToken, updateContact);
 
 /* DELETE */
-router.delete("/delete", verifyToken, deleteContact);
+router.delete("/:userId", verifyToken, deleteContact);
 
 module.exports = router;

@@ -44,7 +44,10 @@ const addContacts = async (req, res) => {
 /* READ */
 const getContacts = async (req, res) => {
   try {
-    //
+    const { userId } = req.params;
+    const user = await User.findById(userId);
+
+    if (user) res.status(200).json("user found");
   } catch (err) {
     res.status(500).json({
       status: "failed",
