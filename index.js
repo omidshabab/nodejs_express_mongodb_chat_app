@@ -115,8 +115,39 @@ io.on("connection", async (socket) => {
   users.push(user);
   console.log(`a new socket connection (${user.username})`);
 
-  /* SEND MESSAGE */
-  socket.on("send-message", (event) => {
+  /* SEND PRIVATE MESSAGE */
+  socket.on("send-private-message", (event) => {
+    switch (event) {
+      case "single_chat":
+        const filteredUsers = users.filter((elem) => elem.username == event.to);
+        if (filteredUsers.length > 0) {
+          filteredUsers.forEach((socketItem) => {
+            socket.broadcast.to(socketItem.socketId).emit("onMessage", {
+              message: event.message,
+              from: user,
+            });
+            console.log(
+              `user ${user.username} sent a message to ${socketItem.username}`
+            );
+          });
+        } else {
+          sendMessageOffline(user.userId, event.message);
+          console.log(
+            `user ${user.username} sent a offline message to ${event.to}`
+          );
+        }
+      case "room_chat":
+        io.to(`ROOMID::${event.roomId}`).emit("onMessage", {
+          message: event.message,
+          from: user,
+          roomId: event.roomId,
+        });
+        saveMessagesInRoom(event.roomId, user.userId, event.message);
+    }
+  });
+
+  /* DELETE PRIVATE MESSAGE */
+  socket.on("delete-message", (event) => {
     switch (event) {
       case "single_chat":
         const filteredUsers = users.filter((elem) => elem.username == event.to);
@@ -154,13 +185,52 @@ io.on("connection", async (socket) => {
     }
   });
 
-  /* UPDATE MESSAGE */
-  socket.on("update-message", (event) => {
+  /* SEND PUBLIC MESSAGE */
+  socket.on("send-public-message", (event) => {
+    switch (event) {
+      case "single_chat":
+        const filteredUsers = users.filter((elem) => elem.username == event.to);
+        if (filteredUsers.length > 0) {
+          filteredUsers.forEach((socketItem) => {
+            socket.broadcast.to(socketItem.socketId).emit("onMessage", {
+              message: event.message,
+              from: user,
+            });
+            console.log(
+              `user ${user.username} sent a message to ${socketItem.username}`
+            );
+          });
+        } else {
+          sendMessageOffline(user.userId, event.message);
+          console.log(
+            `user ${user.username} sent a offline message to ${event.to}`
+          );
+        }
+      case "room_chat":
+        io.to(`ROOMID::${event.roomId}`).emit("onMessage", {
+          message: event.message,
+          from: user,
+          roomId: event.roomId,
+        });
+        saveMessagesInRoom(event.roomId, user.userId, event.message);
+      case "private_chat":
+        break;
+      case "one_way_chat":
+        break;
+      case "bot_chat":
+        break;
+      default:
+        break;
+    }
+  });
+
+  /* UPDATE PUBLIC MESSAGE */
+  socket.on("update-public-message", (event) => {
     //
   });
 
-  /* DELETE MESSAGE */
-  socket.on("delete-message", (event) => {
+  /* DELETE PUBLIC MESSAGE */
+  socket.on("delete-public-message", (event) => {
     //
   });
 

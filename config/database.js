@@ -37,9 +37,9 @@ module.exports = async function connection() {
     });
 
     mongoose.set("strictQuery", false);
-    await mongoose.connect(process.env.MONGO_URL);
+    await mongoose.connect(process.env.MONGO_URL + "landina_account");
     console.log("connected to database.");
   } catch (err) {
-    console.log(error, "could not connect to database.");
+    console.log(err, "could not connect to database.");
   }
 };

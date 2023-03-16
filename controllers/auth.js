@@ -10,35 +10,36 @@ const { verifyOTP } = require("../utils/sms.js");
 /* SIGNUP */
 const signupEmail = async (req, res) => {
   try {
-    const { phone } = req.body;
+    const { email, password } = req.body;
 
-    if (phone == undefined)
+    const salt = await bcrypt.genSalt();
+    const passwordHash = await bcrypt.hash(password, salt);
+
+    if (email == undefined || password == undefined)
       return res.status(400).json({
-        status: "failed",
+        status: "Error",
         error_code: "required fields",
       });
 
-    username = generateUsername(3);
+    username = generateFromEmail(email, 3);
 
     const user = User({
       username,
-      name: username,
-      phone,
+      email,
+      password: passwordHash,
     });
+    await user.save();
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       algorithm: "HS256",
       expiresIn: process.env.JWT_EXPIRY,
     });
 
-    await user.save();
-
     res.status(201).json({
       status: "success",
       data: {
         userId: user._id,
-        name: user.name,
-        username,
+        username: user.username,
         email: user.email,
         desc: user.desc,
         type: user.type,

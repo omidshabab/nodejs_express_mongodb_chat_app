@@ -47,7 +47,7 @@ const getUser = async (req, res) => {
           userId: user._id,
           name: user.name,
           username: user.username,
-          desc: user.desc || "null",
+          desc: user.desc,
           type: user.type,
         },
       });

@@ -11,7 +11,8 @@ const {
 const router = express.Router();
 
 /* CREATE */
-router.post("/:userId", verifyToken, createContact);
+// router.post("/:userId", verifyToken, createContact);
+router.post("/", verifyToken, addContacts);
 
 /* READ */
 router.get("/:userId", verifyToken, getContacts);
