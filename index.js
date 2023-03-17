@@ -82,7 +82,7 @@ io.on("connection", async (socket) => {
 
       if (user) {
         return {
-          status: STATUS.Success,
+          status: "success",
           data: {
             _id: user._id,
             name: user.name,
@@ -91,7 +91,7 @@ io.on("connection", async (socket) => {
         };
       } else {
         return {
-          status: STATUS.Failed,
+          status: "failed",
           data: "User not found!",
         };
       }
@@ -117,32 +117,20 @@ io.on("connection", async (socket) => {
 
   /* SEND PRIVATE MESSAGE */
   socket.on("send-private-message", (event) => {
-    switch (event) {
-      case "single_chat":
-        const filteredUsers = users.filter((elem) => elem.username == event.to);
-        if (filteredUsers.length > 0) {
-          filteredUsers.forEach((socketItem) => {
-            socket.broadcast.to(socketItem.socketId).emit("onMessage", {
-              message: event.message,
-              from: user,
-            });
-            console.log(
-              `user ${user.username} sent a message to ${socketItem.username}`
-            );
-          });
-        } else {
-          sendMessageOffline(user.userId, event.message);
-          console.log(
-            `user ${user.username} sent a offline message to ${event.to}`
-          );
-        }
-      case "room_chat":
-        io.to(`ROOMID::${event.roomId}`).emit("onMessage", {
+    const filteredUsers = users.filter((elem) => elem.userId == event.to);
+    if (filteredUsers.length > 0) {
+      filteredUsers.forEach((socketItem) => {
+        socket.broadcast.to(socketItem.socketId).emit("onMessage", {
           message: event.message,
           from: user,
-          roomId: event.roomId,
         });
-        saveMessagesInRoom(event.roomId, user.userId, event.message);
+        console.log(
+          `user ${user.userId} sent a message to ${socketItem.userId}`
+        );
+      });
+    } else {
+      sendMessageOffline(user.userId, event.message);
+      console.log(`user ${user.userId} sent a offline message to ${event.to}`);
     }
   });
 
@@ -230,6 +218,26 @@ io.on("connection", async (socket) => {
   });
 
   /* DELETE PUBLIC MESSAGE */
+  socket.on("delete-public-message", (event) => {
+    //
+  });
+
+  /* SEND ROOM MESSAGE */
+  socket.on("delete-public-message", (event) => {
+    io.to(`ROOMID::${event.roomId}`).emit("onMessage", {
+      message: event.message,
+      from: user,
+      roomId: event.roomId,
+    });
+    saveMessagesInRoom(event.roomId, user.userId, event.message);
+  });
+
+  /* UPDATE ROOM MESSAGE */
+  socket.on("delete-public-message", (event) => {
+    //
+  });
+
+  /* DELETE ROOM MESSAGE */
   socket.on("delete-public-message", (event) => {
     //
   });
