@@ -7,7 +7,7 @@ const USER_VISIBILITY = {
   Public: "public",
 };
 
-const USER_TYPES = {
+const USER_TYPE = {
   Personal: "personal",
   Business: "business",
   Developer: "developer",
@@ -15,7 +15,12 @@ const USER_TYPES = {
   Vendor: "vendor",
 };
 
-const CART_TYPES = {
+const USER_ROLE = {
+  Personal: "personal",
+  Business: "business",
+};
+
+const CART_TYPE = {
   Font: "font",
   Template: "template",
   Product: "product",
@@ -89,8 +94,13 @@ const UserSchema = Schema(
     },
     type: {
       type: String,
-      enum: USER_TYPES,
-      default: USER_TYPES.Personal,
+      enum: USER_TYPE,
+      default: USER_TYPE.Personal,
+    },
+    role: {
+      type: String,
+      enum: USER_ROLE,
+      default: USER_ROLE.Personal,
     },
     bio: {
       type: String,
@@ -143,8 +153,8 @@ const UserSchema = Schema(
       data: [
         {
           type: Schema.Types.ObjectId,
-          ref: CART_TYPES,
-          default: CART_TYPES.Product,
+          ref: CART_TYPE,
+          default: CART_TYPE.Product,
         },
       ],
     },

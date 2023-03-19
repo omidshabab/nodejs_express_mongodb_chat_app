@@ -8,7 +8,7 @@ const Language = require("../models/Language.js");
 const categories = require("../data/categories.js");
 const languages = require("../data/languages.js");
 
-module.exports = async function connection() {
+async function connection() {
   try {
     const db = mongoose.connection;
     db.on("error", (error) => console.log(error));
@@ -42,4 +42,6 @@ module.exports = async function connection() {
   } catch (err) {
     console.log(err, "could not connect to database.");
   }
-};
+}
+
+module.exports = { connection };

@@ -1,5 +1,5 @@
 const express = require("express");
-const connection = require("./config/database");
+const { connection } = require("./config/database");
 const language = require("./middlewares/language");
 const bodyParser = require("body-parser");
 const cors = require("cors");
