@@ -263,11 +263,12 @@ const UserSchema = Schema(
   },
   {
     timestamps: true,
-    collection: "users",
+    collection: "landina_account",
+    validate: true,
   }
 );
 
-const User = mongoose.model("User", UserSchema);
+const User = mongoose.model("landina_account", UserSchema);
 
 const validate = (user) => {
   const schema = Joi.object({

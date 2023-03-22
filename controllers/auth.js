@@ -6,6 +6,7 @@ const {
   generateUsername,
 } = require("unique-username-generator");
 const { verifyOTP } = require("../utils/sms.js");
+const { default: mongoose } = require("mongoose");
 
 /* SIGNUP */
 const signupEmail = async (req, res) => {
@@ -24,10 +25,12 @@ const signupEmail = async (req, res) => {
     username = generateFromEmail(email, 3);
 
     const user = User({
+      _id: new mongoose.Types.ObjectId(),
       username,
       email,
       password: passwordHash,
     });
+
     await user.save();
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
@@ -208,6 +211,7 @@ const loginUsername = async (req, res) => {
 const loginEmail = async (req, res) => {
   try {
     const { email, password } = req.body;
+
     let user = await User.findOne({ email: email });
     if (email == undefined || password == undefined)
       return res

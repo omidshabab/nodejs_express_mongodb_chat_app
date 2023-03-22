@@ -7,6 +7,7 @@ const Language = require("../models/Language.js");
 /* DATA */
 const categories = require("../data/categories.js");
 const languages = require("../data/languages.js");
+const { config } = require("./config.js");
 
 async function connection() {
   try {
@@ -37,10 +38,13 @@ async function connection() {
     });
 
     mongoose.set("strictQuery", false);
-    await mongoose.connect(process.env.MONGO_URL + "landina_account");
-    console.log("connected to database.");
+
+    return await mongoose
+      .connect(config.db.url)
+      .then(console.log("connected to database."));
   } catch (err) {
     console.log(err, "could not connect to database.");
+    return null.then();
   }
 }
 
