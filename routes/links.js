@@ -1,6 +1,6 @@
 const express = require("express");
 const { createLink, getLinks, updateLink } = require("../controllers/links.js");
-const { verifyToken } = require("../middlewares/auth.js");
+const { verifyToken } = require("../middlewares/accounts/auth.js");
 
 const router = express.Router();
 

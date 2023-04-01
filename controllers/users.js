@@ -1,9 +1,9 @@
-const { User } = require("../models/User.js");
-const Coupon = require("../models/Coupon.js");
+const { User } = require("../models/Accounts/User.js");
+const Coupon = require("../models/Coupons/Coupon.js");
 const bcrypt = require("bcrypt");
 const crypto = import("crypto");
-const Link = require("../models/Link.js");
-const Notification = require("../models/Notification.js");
+const Link = require("../models/Links/Link.js");
+const Notification = require("../models/Notifications/Notification.js");
 const path = require("path");
 const Token = require("../models/Token.js");
 const sendEmail = require("../utils/email.js");

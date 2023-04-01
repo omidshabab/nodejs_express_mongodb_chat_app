@@ -1,11 +1,11 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { User } = require("../models/User.js");
+const { User } = require("../../../models/Accounts/User.js");
 const {
   generateFromEmail,
   generateUsername,
 } = require("unique-username-generator");
-const { verifyOTP } = require("../utils/sms.js");
+const { verifyOTP } = require("../../../utils/sms.js");
 const { default: mongoose } = require("mongoose");
 
 /* SIGNUP */

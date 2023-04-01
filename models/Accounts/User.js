@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Joi = require("joi");
+const { landinaAccountDB } = require("../../config/database");
 const Schema = mongoose.Schema;
 
 const USER_VISIBILITY = {
@@ -263,12 +264,11 @@ const UserSchema = Schema(
   },
   {
     timestamps: true,
-    collection: "landina_account",
     validate: true,
   }
 );
 
-const User = mongoose.model("landina_account", UserSchema);
+const User = landinaAccountDB.model("User", UserSchema);
 
 const validate = (user) => {
   const schema = Joi.object({

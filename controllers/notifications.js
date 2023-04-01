@@ -1,5 +1,5 @@
-const Notification = require("../models/Notification.js");
-const User = require("../models/User.js");
+const Notification = require("../models/Notifications/Notification.js");
+const User = require("../models/Accounts/User.js");
 
 /* CREATE */
 const createNotif = async (req, res) => {

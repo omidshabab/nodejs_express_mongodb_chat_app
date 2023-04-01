@@ -1,5 +1,5 @@
 const express = require("express");
-const { connection } = require("./config/database");
+const { landinaAccountDB, landinaChatDB } = require("./config/database");
 const language = require("./middlewares/language");
 const bodyParser = require("body-parser");
 const cors = require("cors");
@@ -19,7 +19,8 @@ const categoryRoutes = require("./routes/categories.js");
 const linkRoutes = require("./routes/links.js");
 const contactsRoutes = require("./routes/contacts.js");
 const taskRoutes = require("./routes/tasks.js");
-const chatsRoutes = require("./routes/chats.js");
+const chatsRoutes = require("./routes/chats/chats.js");
+const roomChatsRoutes = require("./routes/chats/room.js");
 const chatgptRoutes = require("./routes/chatgpt.js");
 const locationRoutes = require("./routes/links.js");
 const storyRoutes = require("./routes/links.js");
@@ -28,9 +29,9 @@ const commentRoutes = require("./routes/comments.js");
 const notificationRoutes = require("./routes/notifications.js");
 const uploadRoutes = require("./routes/upload.js");
 const SocketUser = require("./models/user.socket");
-const { User } = require("./models/User");
+const { User } = require("./models/Accounts/User");
 const { sendMessageOffline } = require("./utils/offline.messages");
-const { verifyAPIKey } = require("./middlewares/auth");
+const { verifyAPIKey } = require("./middlewares/accounts/auth");
 
 /* CONFIGURATIONS */
 dotenv.config();
@@ -52,6 +53,7 @@ app.use("/links", verifyAPIKey, linkRoutes);
 app.use("/contacts", verifyAPIKey, contactsRoutes);
 app.use("/tasks", verifyAPIKey, taskRoutes);
 app.use("/chats", verifyAPIKey, chatsRoutes);
+app.use("/chats/rooms", verifyAPIKey, chatsRoutes);
 app.use("/chatgpt", verifyAPIKey, chatgptRoutes);
 app.use("/locations", verifyAPIKey, locationRoutes);
 app.use("/stories", verifyAPIKey, storyRoutes);
@@ -62,9 +64,6 @@ app.use("/upload", verifyAPIKey, uploadRoutes);
 
 /* SERVICES */
 language;
-
-/* MONGOOSE SETUP */
-(async () => await connection())();
 
 /* SERVER SETUP */
 const port = process.env.PORT || 6001;

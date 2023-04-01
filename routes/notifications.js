@@ -6,7 +6,7 @@ const {
   updateNotif,
   deleteNotif,
 } = require("../controllers/notifications");
-const { verifyToken } = require("../middlewares/auth");
+const { verifyToken } = require("../middlewares/accounts/auth");
 
 const router = express.Router();
 

@@ -1,5 +1,5 @@
-const Contact = require("../models/Contact");
-const { User } = require("../models/User");
+const { Contact } = require("../models/Contacts/Contact.js");
+const { User } = require("../models/Accounts/User");
 
 /* CREATE */
 const createContact = async (req, res) => {

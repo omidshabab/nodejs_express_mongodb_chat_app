@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 /* MODELS */
-const Category = require("../models/Category.js");
+const Category = require("../models/Coupons/Category.js");
 const Language = require("../models/Language.js");
 
 /* DATA */
@@ -9,43 +9,22 @@ const categories = require("../data/categories.js");
 const languages = require("../data/languages.js");
 const { config } = require("./config.js");
 
-async function connection() {
-  try {
-    const db = mongoose.connection;
-    db.on("error", (error) => console.log(error));
-    db.once("open", async () => {
-      // CATEGORIES
-      if ((await Category.countDocuments().exec()) > 0) return;
-      let submitCategories = [];
-      categories.forEach((category) => {
-        submitCategories.push({ name: category });
-      });
-      Category.insertMany(submitCategories, (err) => {
-        if (err) return console.log(err);
-        console.log("Categories submitted");
-      });
+mongoose.set("strictQuery", false);
 
-      // LANGUAGES
-      if ((await Language.countDocuments().exec()) > 0) return;
-      let submitLangs = [];
-      languages.forEach((language) => {
-        submitLangs.push({ name: language });
-      });
-      Language.insertMany(submitLangs, (err) => {
-        if (err) return console.log(err);
-        console.log("Langs submitted");
-      });
-    });
-
-    mongoose.set("strictQuery", false);
-
-    return await mongoose
-      .connect(config.db.url)
-      .then(console.log("connected to database."));
-  } catch (err) {
-    console.log(err, "could not connect to database.");
-    return null.then();
+const landinaAccountDB = mongoose.createConnection(
+  config.landinaAccountDB.url,
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
   }
-}
+);
 
-module.exports = { connection };
+const landinaChatDB = mongoose.createConnection(config.landinaChatDB.url, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+
+module.exports = {
+  landinaAccountDB,
+  landinaChatDB,
+};
