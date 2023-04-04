@@ -32,6 +32,10 @@ const SocketUser = require("./models/user.socket");
 const { User } = require("./models/Accounts/User");
 const { sendMessageOffline } = require("./utils/offline.messages");
 const { verifyAPIKey } = require("./middlewares/accounts/auth");
+const { default: mongoose } = require("mongoose");
+const { config } = require("./config/config");
+const Room = require("./models/Chats/Room");
+const Message = require("./models/Chats/Message/message");
 
 /* CONFIGURATIONS */
 dotenv.config();
@@ -65,12 +69,19 @@ app.use("/upload", verifyAPIKey, uploadRoutes);
 /* SERVICES */
 language;
 
+/* DATABASE */
+mongoose
+  .connect(config.landinaAccountDB.url)
+  .then(() => console.log(`Connected to ${config.landinaAccountDB.name}`))
+  .catch((err) => console.log(err));
+
 /* SERVER SETUP */
 const port = process.env.PORT || 6001;
 server.listen(port, () => console.log(`Listening on port ${port}...`));
 
 /* SOCKET.IO */
 const users = [];
+const roomSocket = {};
 io.on("connection", async (socket) => {
   const userId = socket.handshake.query.userId;
 
@@ -222,13 +233,28 @@ io.on("connection", async (socket) => {
   });
 
   /* SEND ROOM MESSAGE */
-  socket.on("delete-public-message", (event) => {
-    io.to(`ROOMID::${event.roomId}`).emit("onMessage", {
-      message: event.message,
-      from: user,
-      roomId: event.roomId,
-    });
-    saveMessagesInRoom(event.roomId, user.userId, event.message);
+  socket.on("send-room-message", async ({ roomId, message }) => {
+    try {
+      const { senderId, content } = message;
+      const room = await Room.findById(roomId);
+
+      if (!room) {
+        return socket.emit("error", "Room not found");
+      }
+
+      const newMessage = new Message({
+        senderId,
+        roomId,
+        content,
+      });
+      await newMessage.save();
+
+      room.messages.push(newMessage._id);
+      await room.save();
+    } catch (err) {
+      console.log(err);
+      socket.emit("error", "Server error");
+    }
   });
 
   /* UPDATE ROOM MESSAGE */
@@ -257,15 +283,27 @@ io.on("connection", async (socket) => {
   });
 
   /* JOIN A ROOM */
-  socket.on("join-room", (event) => {
-    socket.join(`ROOMID::${event.roomId}`);
-    console.log(`user ${user.userId} joined to ${event.roomId} room`);
+  socket.on("join-room", async (roomId) => {
+    try {
+      const room = await Room.findById(roomId);
+      if (!room) {
+        return socket.emit("error", "Room not found");
+      }
+      socket.join(roomId);
+      roomSocket[roomId] = roomSocket.roomId || [];
+      roomSocket[roomId].push(socket);
+
+      const messages = await Message.find({ roomId }).populate("senderId");
+      socket.emit("messages", messages);
+    } catch (err) {
+      //
+    }
   });
 
   /* LEAVE A ROOM */
-  socket.on("leave-room", (event) => {
-    socket.leave(`ROOMID::${event.roomId}`);
-    console.log(`user ${user.userId} left to ${event.roomId} room`);
+  socket.on("leave-room", (roomId) => {
+    socket.leave(roomId);
+    roomSocket[roomId] = roomSocket[roomId].filter((s) => s !== socket);
   });
 
   /* USER NETWORK STATUS */
