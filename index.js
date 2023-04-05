@@ -10,6 +10,7 @@ const app = express();
 const http = require("http");
 const server = http.createServer(app);
 const io = require("socket.io")(server);
+const multer = require("multer");
 const path = require("path");
 const { fileURLToPath } = require("url");
 const authRoutes = require("./routes/auth.js");
@@ -32,7 +33,7 @@ const SocketUser = require("./models/user.socket");
 const { User } = require("./models/Accounts/User");
 const { sendMessageOffline } = require("./utils/offline.messages");
 const { verifyAPIKey } = require("./middlewares/accounts/auth");
-const { default: mongoose } = require("mongoose");
+const mongoose = require("mongoose");
 const { config } = require("./config/config");
 const Room = require("./models/Chats/Room");
 const Message = require("./models/Chats/Message/message");
@@ -74,6 +75,19 @@ mongoose
   .connect(config.landinaAccountDB.url)
   .then(() => console.log(`Connected to ${config.landinaAccountDB.name}`))
   .catch((err) => console.log(err));
+
+/* CONFIGURE MULTER FOR FILE UPLOADS */
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads/");
+  },
+  filename: function (req, file, cb) {
+    const ext = path.extname(file.originalname);
+    cb(null, Date.now() + ext);
+  },
+});
+
+const upload = multer({ storage: storage });
 
 /* SERVER SETUP */
 const port = process.env.PORT || 6001;
