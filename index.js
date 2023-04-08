@@ -1,6 +1,4 @@
 const express = require("express");
-const { landinaAccountDB, landinaChatDB } = require("./config/database");
-const language = require("./middlewares/language");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const dotenv = require("dotenv");
@@ -66,9 +64,6 @@ app.use("/fonts", verifyAPIKey, fontRoutes);
 app.use("/comments", verifyAPIKey, commentRoutes);
 app.use("/notifications", verifyAPIKey, notificationRoutes);
 app.use("/upload", verifyAPIKey, uploadRoutes);
-
-/* SERVICES */
-language;
 
 /* DATABASE */
 mongoose
