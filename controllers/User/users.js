@@ -1,4 +1,4 @@
-const { User } = require("../../models/Users/User.js");
+const { User } = require("../../models/Accounts/User.js");
 const Coupon = require("../../models/Coupons/Coupon.js");
 const bcrypt = require("bcrypt");
 const crypto = import("crypto");

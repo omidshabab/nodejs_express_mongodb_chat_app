@@ -1,12 +1,4 @@
 const mongoose = require("mongoose");
-
-/* MODELS */
-const Category = require("../models/Coupons/Category.js");
-const Language = require("../models/Language.js");
-
-/* DATA */
-const categories = require("../data/categories.js");
-const languages = require("../data/languages.js");
 const { config } = require("./config.js");
 
 mongoose.set("strictQuery", false);
