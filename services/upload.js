@@ -1,5 +1,5 @@
 const express = require("express");
-const { profile } = require("../services/upload/upload.js");
+const { profile } = require("./upload/upload.js");
 const { verifyToken } = require("../middlewares/accounts/auth.js");
 const { upload } = require("../middlewares/upload.js");
 

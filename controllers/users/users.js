@@ -5,7 +5,7 @@ const crypto = import("crypto");
 const Link = require("../../models/Links/Link.js");
 const Notification = require("../../models/Notifications/Notification.js");
 const path = require("path");
-const Token = require("../../models/Tokens/Token.js");
+const Token = require("../../models/Users/Tokens/Token.js");
 const sendEmail = require("../../utils/email.js");
 const { STATUS } = require("../../config/status.js");
 

@@ -1,7 +1,7 @@
 const express = require("express");
 const {
   searchCategories,
-} = require("../controllers/coupons/categories/categories");
+} = require("../../../controllers/coupons/categories/categories");
 
 const router = express.Router();
 

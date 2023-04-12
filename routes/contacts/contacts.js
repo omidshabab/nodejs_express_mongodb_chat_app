@@ -1,11 +1,11 @@
 const express = require("express");
-const { verifyToken } = require("../middlewares/accounts/auth");
+const { verifyToken } = require("../../middlewares/accounts/auth");
 const {
   addContacts,
   getContacts,
   updateContact,
   deleteContact,
-} = require("../controllers/contacts/contacts.js");
+} = require("../../controllers/contacts/contacts.js");
 
 const router = express.Router();
 
