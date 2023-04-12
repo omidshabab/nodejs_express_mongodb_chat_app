@@ -16,7 +16,7 @@ const {
   checkUsername,
   getUserNotifications,
   getUserImages,
-} = require("../controllers/users.js");
+} = require("../controllers/users/users.js");
 const { verifyToken } = require("../middlewares/accounts/auth.js");
 
 const router = express.Router();

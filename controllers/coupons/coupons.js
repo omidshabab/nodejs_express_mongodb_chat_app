@@ -1,5 +1,5 @@
-const Category = require("../models/Coupons/Category.js");
-const Coupon = require("../models/Coupons/Coupon.js");
+const Category = require("../../models/Coupons/Category.js");
+const Coupon = require("../../models/Coupons/Coupon.js");
 
 /* CREATE */
 const createCoupon = async (req, res) => {

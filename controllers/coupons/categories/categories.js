@@ -1,4 +1,4 @@
-const Category = require("../models/Coupons/Category.js");
+const Category = require("../../../models/Coupons/Category.js");
 
 /* CREATE */
 

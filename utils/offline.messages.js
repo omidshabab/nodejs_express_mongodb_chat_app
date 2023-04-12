@@ -1,4 +1,4 @@
-const { User } = require("../models/Accounts/User");
+const { User } = require("../models/Users/User.js");
 
 /* CREATE */
 async function sendMessageOffline(fromId, toId, message) {

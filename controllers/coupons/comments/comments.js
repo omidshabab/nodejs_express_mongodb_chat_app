@@ -1,6 +1,6 @@
-const Comment = require("../models/Comment");
-const Coupon = require("../models/Coupons/Coupon");
-const User = require("../models/Accounts/User");
+const Coupon = require("../../../models/Coupons/Coupon.js");
+const { User } = require("../../../models/Users/User.js");
+const Comment = require("../../../models/Coupons/Comments/Comment.js");
 
 /* CREATE */
 const createComment = async (req, res) => {

@@ -6,7 +6,7 @@ const {
   deleteCoupon,
   getCoupons,
   getSingleCoupon,
-} = require("../controllers/coupons.js");
+} = require("../controllers/coupons/coupons.js");
 const { verifyToken } = require("../middlewares/accounts/auth.js");
 
 const router = express.Router();

@@ -1,5 +1,7 @@
 const express = require("express");
-const { searchCategories } = require("../controllers/categories");
+const {
+  searchCategories,
+} = require("../controllers/coupons/categories/categories");
 
 const router = express.Router();
 

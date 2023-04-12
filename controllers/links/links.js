@@ -1,5 +1,5 @@
-const Link = require("../models/Links/Link.js");
-const User = require("../models/Accounts/User.js");
+const Link = require("../../models/Links/Link.js");
+const { User } = require("../../models/Users/User.js");
 
 /* CREATE */
 const createLink = async (req, res) => {

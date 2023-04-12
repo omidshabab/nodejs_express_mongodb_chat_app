@@ -1,6 +1,6 @@
 const path = require("path");
 const fs = require("fs");
-const User = require("../../models/Accounts/User");
+const { User } = require("../../models/Users/User.js");
 
 const profile = async (req, res) => {
   let userId = req.header("userId");

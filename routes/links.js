@@ -1,5 +1,9 @@
 const express = require("express");
-const { createLink, getLinks, updateLink } = require("../controllers/links.js");
+const {
+  createLink,
+  getLinks,
+  updateLink,
+} = require("../controllers/links/links.js");
 const { verifyToken } = require("../middlewares/accounts/auth.js");
 
 const router = express.Router();

@@ -9,7 +9,7 @@ const {
   loginPhone,
   loginGoogle,
   loginWallet,
-} = require("../controllers/accounts/auth/auth.js");
+} = require("../controllers/auth/auth.js");
 const { sendOTP, verifyOTP } = require("../utils/sms.js");
 
 const router = express.Router();
