@@ -1,28 +1,21 @@
-const STATUS = {
-  Success: "success",
-  Failed: "failed",
+const httpStatus = {
+  CONTINUE: 100,
+  OK: 200,
+  CREATED: 201,
+  ACCEPTED: 202,
+  NO_CONTENT: 204,
+  RESET_CONTENT: 205,
+  BAD_REQUEST: 400,
+  UNAUTHORIZED: 401,
+  FORBIDDEN: 403,
+  NOT_FOUND: 404,
+  METHOD_NOT_ALLOWED: 405,
+  CONFLICT: 409,
+  INTERNAL_SERVER_ERROR: 500,
+  NOT_IMPLEMENTED: 501,
+  BAD_GATEWAY: 502,
+  SERVICE_UNAVAILABLE: 503,
+  GATEWAY_TIMEOUT: 504,
 };
 
-const STATUS_CODE = {
-  200: "200",
-  404: "404",
-  500: "500",
-};
-
-// const STATUS = {
-//   200: {
-//     status: "success",
-//     status_code: 200,
-//     message: "Successfully",
-//   },
-//   404: {
-//     status: "failed",
-//     status_code: 404,
-//     message: "Not Found!",
-//   },
-//   500: {
-//     status: "failed",
-//     status_code: 500,
-//     message: "Failed",
-//   },
-// };
+module.exports = httpStatus;
