@@ -26,11 +26,10 @@ const storyRoutes = require("./routes/links/links.js");
 const fontRoutes = require("./routes/links/links.js");
 const commentRoutes = require("./routes/coupons/comments/comments.js");
 const notificationRoutes = require("./routes/notifications/notifications.js");
-const uploadRoutes = require("./services/upload.js");
 const SocketUser = require("./models/user.socket");
 const { User } = require("./models/Users/User.js");
 const { sendMessageOffline } = require("./utils/offline.messages");
-const { verifyAPIKey } = require("./middlewares/accounts/auth");
+const { verifyAPIKey } = require("./middlewares/auth.js");
 const mongoose = require("mongoose");
 const { config } = require("./config/config");
 const Room = require("./models/Chats/Room");
@@ -63,7 +62,6 @@ app.use("/stories", verifyAPIKey, storyRoutes);
 app.use("/fonts", verifyAPIKey, fontRoutes);
 app.use("/comments", verifyAPIKey, commentRoutes);
 app.use("/notifications", verifyAPIKey, notificationRoutes);
-app.use("/upload", verifyAPIKey, uploadRoutes);
 
 /* DATABASE */
 mongoose

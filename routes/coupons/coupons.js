@@ -7,7 +7,7 @@ const {
   getCoupons,
   getSingleCoupon,
 } = require("../../controllers/coupons/coupons.js");
-const { verifyToken } = require("../../middlewares/accounts/auth.js");
+const { verifyToken } = require("../../middlewares/auth.js");
 
 const router = express.Router();
 

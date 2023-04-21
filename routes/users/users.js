@@ -17,7 +17,7 @@ const {
   getUserNotifications,
   getUserImages,
 } = require("../../controllers/users/users.js");
-const { verifyToken } = require("../../middlewares/accounts/auth.js");
+const { verifyToken } = require("../../middlewares/auth.js");
 
 const router = express.Router();
 

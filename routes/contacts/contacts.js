@@ -1,5 +1,5 @@
 const express = require("express");
-const { verifyToken } = require("../../middlewares/accounts/auth");
+const { verifyToken } = require("../../middlewares/auth");
 const {
   addContacts,
   getContacts,
