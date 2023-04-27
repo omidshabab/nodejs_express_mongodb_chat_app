@@ -4,27 +4,28 @@ const { landinaAccountDB } = require("../../config/database");
 const Schema = mongoose.Schema;
 
 const USER_VISIBILITY = {
-  Private: "private",
-  Public: "public",
+  PRIVATE: "private",
+  PUBLIC: "public",
 };
 
 const USER_TYPE = {
-  Personal: "personal",
-  Business: "business",
-  Developer: "developer",
-  Creator: "creator",
-  Vendor: "vendor",
+  PERSONAL: "personal",
+  BUSINESS: "business",
+  DEVELOPER: "developer",
+  CREATOR: "creator",
+  VENDOR: "vendor",
 };
 
 const USER_ROLE = {
-  Personal: "personal",
-  Business: "business",
+  OWNER: "owner",
+  ADMIN: "admin",
+  VIEWER: "viewer",
 };
 
 const CART_TYPE = {
-  Font: "font",
-  Template: "template",
-  Product: "product",
+  FONT: "font",
+  TEMPLATE: "template",
+  PRODUCT: "product",
 };
 
 const UserSchema = Schema(
@@ -64,195 +65,129 @@ const UserSchema = Schema(
       min: 6,
       trim: true,
     },
-    images: {
-      type: String,
-      data: [
-        {
-          type: Schema.Types.ObjectId,
-          ref: "Image",
-        },
-      ],
-    },
-    followers: {
-      type: Number,
-      default: 0,
-      data: [
-        {
-          type: Schema.Types.ObjectId,
-          ref: "User",
-        },
-      ],
-    },
-    followings: {
-      type: Number,
-      default: 0,
-      data: [
-        {
-          type: Schema.Types.ObjectId,
-          ref: "User",
-        },
-      ],
-    },
+    images: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Image",
+      },
+    ],
+    followers: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+    followings: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
     type: {
       type: String,
       enum: USER_TYPE,
-      default: USER_TYPE.Personal,
+      default: USER_TYPE.PERSONAL,
     },
     role: {
       type: String,
       enum: USER_ROLE,
-      default: USER_ROLE.Personal,
     },
     bio: {
       type: String,
       max: 50,
       default: "",
     },
-    links: {
-      type: Number,
-      default: 0,
-      data: [
-        {
-          type: Schema.Types.ObjectId,
-          ref: "Link",
-        },
-      ],
-    },
-    coupons: {
-      type: Number,
-      default: 0,
-      data: [
-        {
-          type: Schema.Types.ObjectId,
-          ref: "Coupon",
-        },
-      ],
-    },
-    notifications: {
-      type: Number,
-      default: 0,
-      data: [
-        {
-          type: Schema.Types.ObjectId,
-          ref: "Notifications",
-        },
-      ],
-    },
+    links: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Link",
+      },
+    ],
+    coupons: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Coupon",
+      },
+    ],
+    notifications: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Notifications",
+      },
+    ],
+    chats: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Chats",
+      },
+    ],
     contacts: {
-      type: Number,
-      default: 0,
-      data: [
-        {
-          type: Schema.Types.ObjectId,
-          ref: "Contacts",
-        },
-      ],
+      type: Schema.Types.ObjectId,
+      ref: "Contacts",
     },
-    cart: {
-      type: Number,
-      default: 0,
-      data: [
-        {
-          type: Schema.Types.ObjectId,
-          ref: CART_TYPE,
-          default: CART_TYPE.Product,
-        },
-      ],
-    },
+    cart: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: CART_TYPE,
+        default: CART_TYPE.PRODUCT,
+      },
+    ],
     location: {
-      type: Number,
-      default: 0,
-      data: [
-        {
-          type: Schema.Types.ObjectId,
-          ref: "Location",
-        },
-      ],
+      type: Schema.Types.ObjectId,
+      ref: "Location",
     },
-    deleted: {
-      type: Number,
-      default: 0,
-      data: [
-        {
-          type: Schema.Types.ObjectId,
-          ref: "Coupon",
-        },
-      ],
-    },
-    archived: {
-      type: Number,
-      default: 0,
-      data: [
-        {
-          type: Schema.Types.ObjectId,
-          ref: "Coupon",
-        },
-      ],
-    },
-    saved: {
-      type: Number,
-      default: 0,
-      data: [
-        {
-          type: Schema.Types.ObjectId,
-          ref: "Coupon",
-        },
-      ],
-    },
-    blocked: {
-      type: Number,
-      default: 0,
-      data: [
-        {
-          type: Schema.Types.ObjectId,
-          ref: "User",
-        },
-      ],
-    },
-    liked: {
-      type: Number,
-      default: 0,
-      data: [
-        {
-          type: Schema.Types.ObjectId,
-          ref: "Coupon",
-        },
-      ],
-    },
-    comments: {
-      type: Number,
-      default: 0,
-      data: [
-        {
-          type: Schema.Types.ObjectId,
-          ref: "Comments",
-        },
-      ],
-    },
-    analytics: {
-      type: Number,
-      default: 0,
-      data: [
-        {
-          type: Schema.Types.ObjectId,
-          ref: "Analytics",
-        },
-      ],
-    },
+    deleted: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Message",
+      },
+    ],
+    archived: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Chat",
+      },
+    ],
+    saved: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Message",
+      },
+    ],
+    blocked: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+    liked: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Message",
+      },
+    ],
+    comments: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Message",
+      },
+    ],
+    analytics: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Analytics",
+      },
+    ],
     verified: {
       type: Boolean,
       default: false,
     },
-    backups: {
-      type: Number,
-      default: 0,
-      data: [
-        {
-          type: Schema.Types.ObjectId,
-          ref: "Backups",
-        },
-      ],
-    },
+    backups: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Backups",
+      },
+    ],
     isActive: {
       type: Boolean,
       default: true,

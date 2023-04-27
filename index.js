@@ -13,15 +13,12 @@ const path = require("path");
 const { fileURLToPath } = require("url");
 const authRoutes = require("./routes/auth/auth.js");
 const userRoutes = require("./routes/users/users.js");
-const couponRoutes = require("./routes/coupons/coupons.js");
-const categoryRoutes = require("./routes/coupons/categories/categories.js");
 const linkRoutes = require("./routes/links/links.js");
 const contactsRoutes = require("./routes/contacts/contacts.js");
 const taskRoutes = require("./routes/tasks/tasks.js");
 const locationRoutes = require("./routes/links/links.js");
 const storyRoutes = require("./routes/links/links.js");
 const fontRoutes = require("./routes/links/links.js");
-const commentRoutes = require("./routes/coupons/comments/comments.js");
 const notificationRoutes = require("./routes/notifications/notifications.js");
 const SocketUser = require("./models/user.socket");
 const { User } = require("./models/Users/User.js");
@@ -31,10 +28,9 @@ const mongoose = require("mongoose");
 const { config } = require("./config/config");
 const Bot = require("./models/Chats/Bot");
 const OneWay = require("./models/Chats/OneWay");
-const Private = require("./models/Chats/Private");
 const PeerToPeer = require("./models/Chats/PeerToPeer");
 const Room = require("./models/Chats/Room");
-const Message = require("./models/Chats/Message/message");
+const Message = require("./models/Chats/Message/Message.js");
 const createMessage = require("./controllers/chats/messages/message.js");
 const { saveChat } = require("./controllers/chats/peer.to.peer.js");
 
@@ -52,15 +48,12 @@ app.use("/assets", express.static(path.join(__dirname, "peer-to-peer/assets")));
 /* ROUTES */
 app.use("/auth", authRoutes);
 app.use("/users", verifyAPIKey, userRoutes);
-app.use("/coupons", verifyAPIKey, couponRoutes);
-app.use("/categories", verifyAPIKey, categoryRoutes);
 app.use("/links", verifyAPIKey, linkRoutes);
 app.use("/contacts", verifyAPIKey, contactsRoutes);
 app.use("/tasks", verifyAPIKey, taskRoutes);
 app.use("/locations", verifyAPIKey, locationRoutes);
 app.use("/stories", verifyAPIKey, storyRoutes);
 app.use("/fonts", verifyAPIKey, fontRoutes);
-app.use("/comments", verifyAPIKey, commentRoutes);
 app.use("/notifications", verifyAPIKey, notificationRoutes);
 
 /* DATABASE */

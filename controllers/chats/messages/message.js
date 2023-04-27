@@ -1,9 +1,9 @@
 const { landinaChatDB } = require("../../../config/database");
-const Message = require("../../../models/Chats/Message/message");
+const Message = require("../../../models/Chats/Message/Message");
 
-const createMessage = async (fromId, toId, message) => {
+const createMessage = async (senderId, toId, message) => {
   if (
-    fromId == undefined ||
+    senderId == undefined ||
     toId == undefined ||
     message == undefined ||
     message == ""
@@ -12,10 +12,7 @@ const createMessage = async (fromId, toId, message) => {
   }
 
   try {
-    const newMessage = landinaChatDB
-      .collection("messages_" + toId)
-      .insertOne(Message);
-    return newMessage;
+    await Message.save();
   } catch (err) {
     console.error(err);
     return err;
