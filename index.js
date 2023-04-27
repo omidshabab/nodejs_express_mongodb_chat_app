@@ -69,19 +69,6 @@ mongoose
   .then(() => console.log(`Connected to ${config.landinaAccountDB.name}`))
   .catch((err) => console.log(err));
 
-/* CONFIGURE MULTER FOR FILE UPLOADS */
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads/");
-  },
-  filename: function (req, file, cb) {
-    const ext = path.extname(file.originalname);
-    cb(null, Date.now() + ext);
-  },
-});
-
-const upload = multer({ storage: storage });
-
 /* SERVER SETUP */
 const port = process.env.PORT || 6001;
 server.listen(port, () => console.log(`Listening on port ${port}...`));
