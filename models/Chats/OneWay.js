@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
+const { landinaChatDB } = require("../../config/database");
 
-const OneWayChatSchema = Schema(
+const OneWayChatSchema = mongoose.Schema(
   {
     name: {
       type: String,
@@ -11,5 +11,5 @@ const OneWayChatSchema = Schema(
   { timestamps: true }
 );
 
-const OneWayChat = mongoose.model("OneWayChat", OneWayChatSchema);
+const OneWayChat = landinaChatDB.model("OneWayChat", OneWayChatSchema);
 module.exports = OneWayChat;

@@ -117,7 +117,7 @@ io.on("connection", async (socket) => {
   });
 
   users.push(user);
-  console.log(`a new socket connection (${user.username})`);
+  console.log(`a new socket connection (${user.username}: ${user.userId})`);
 
   /* SEND PRIVATE MESSAGE */
   socket.on("send-private-message", (event) => {
