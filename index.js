@@ -18,9 +18,6 @@ const categoryRoutes = require("./routes/coupons/categories/categories.js");
 const linkRoutes = require("./routes/links/links.js");
 const contactsRoutes = require("./routes/contacts/contacts.js");
 const taskRoutes = require("./routes/tasks/tasks.js");
-const chatsRoutes = require("./routes/chats/chats.js");
-const roomChatsRoutes = require("./routes/chats/room.js");
-const chatgptRoutes = require("./routes/chatgpt/chatgpt.js");
 const locationRoutes = require("./routes/links/links.js");
 const storyRoutes = require("./routes/links/links.js");
 const fontRoutes = require("./routes/links/links.js");
@@ -32,8 +29,14 @@ const { sendMessageOffline } = require("./utils/offline.messages");
 const { verifyAPIKey } = require("./middlewares/auth.js");
 const mongoose = require("mongoose");
 const { config } = require("./config/config");
+const Bot = require("./models/Chats/Bot");
+const OneWay = require("./models/Chats/OneWay");
+const Private = require("./models/Chats/Private");
+const PeerToPeer = require("./models/Chats/PeerToPeer");
 const Room = require("./models/Chats/Room");
 const Message = require("./models/Chats/Message/message");
+const createMessage = require("./controllers/chats/messages/message.js");
+const { saveChat } = require("./controllers/chats/peer.to.peer.js");
 
 /* CONFIGURATIONS */
 dotenv.config();
@@ -44,7 +47,7 @@ app.use(morgan("common"));
 app.use(bodyParser.json({ limit: "30mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 app.use(cors());
-app.use("/assets", express.static(path.join(__dirname, "public/assets")));
+app.use("/assets", express.static(path.join(__dirname, "peer-to-peer/assets")));
 
 /* ROUTES */
 app.use("/auth", authRoutes);
@@ -54,9 +57,6 @@ app.use("/categories", verifyAPIKey, categoryRoutes);
 app.use("/links", verifyAPIKey, linkRoutes);
 app.use("/contacts", verifyAPIKey, contactsRoutes);
 app.use("/tasks", verifyAPIKey, taskRoutes);
-app.use("/chats", verifyAPIKey, chatsRoutes);
-app.use("/chats/rooms", verifyAPIKey, chatsRoutes);
-app.use("/chatgpt", verifyAPIKey, chatgptRoutes);
 app.use("/locations", verifyAPIKey, locationRoutes);
 app.use("/stories", verifyAPIKey, storyRoutes);
 app.use("/fonts", verifyAPIKey, fontRoutes);
@@ -75,7 +75,6 @@ server.listen(port, () => console.log(`Listening on port ${port}...`));
 
 /* SOCKET.IO */
 const users = [];
-const roomSocket = {};
 io.on("connection", async (socket) => {
   const userId = socket.handshake.query.userId;
 
@@ -119,12 +118,12 @@ io.on("connection", async (socket) => {
   users.push(user);
   console.log(`a new socket connection (${user.username}: ${user.userId})`);
 
-  /* SEND PRIVATE MESSAGE */
-  socket.on("send-private-message", (event) => {
+  /* SEND MESSAGE ON PRIVATE CHAT */
+  socket.on("send-private-chat", (event) => {
     const filteredUsers = users.filter((elem) => elem.userId == event.to);
     if (filteredUsers.length > 0) {
       filteredUsers.forEach((socketItem) => {
-        socket.broadcast.to(socketItem.socketId).emit("onMessage", {
+        socket.broadcast.to(socketItem.socketId).emit("message", {
           message: event.message,
           from: user,
         });
@@ -133,101 +132,20 @@ io.on("connection", async (socket) => {
         );
       });
     } else {
-      sendMessageOffline(user.userId, event.message);
-      console.log(`user ${user.userId} sent a offline message to ${event.to}`);
+      // OFFLINE MESSAGE
+      console.log(`user ${user.userId} sent an offline message to ${event.to}`);
     }
   });
 
-  /* DELETE PRIVATE MESSAGE */
-  socket.on("delete-message", (event) => {
-    switch (event) {
-      case "single_chat":
-        const filteredUsers = users.filter((elem) => elem.username == event.to);
-        if (filteredUsers.length > 0) {
-          filteredUsers.forEach((socketItem) => {
-            socket.broadcast.to(socketItem.socketId).emit("onMessage", {
-              message: event.message,
-              from: user,
-            });
-            console.log(
-              `user ${user.username} sent a message to ${socketItem.username}`
-            );
-          });
-        } else {
-          sendMessageOffline(user.userId, event.message);
-          console.log(
-            `user ${user.username} sent a offline message to ${event.to}`
-          );
-        }
-      case "room_chat":
-        io.to(`ROOMID::${event.roomId}`).emit("onMessage", {
-          message: event.message,
-          from: user,
-          roomId: event.roomId,
-        });
-        saveMessagesInRoom(event.roomId, user.userId, event.message);
-      case "private_chat":
-        break;
-      case "one_way_chat":
-        break;
-      case "bot_chat":
-        break;
-      default:
-        break;
-    }
+  /* SEND MESSAGE ON PEER TO PEER CHAT */
+  socket.on("send-peer-to-peer-chat", ({ from, to, message }) => {
+    saveChat(from, to, message);
+
+    io.to(to).emit("chat", { from, to, message });
   });
 
-  /* SEND PUBLIC MESSAGE */
-  socket.on("send-public-message", (event) => {
-    switch (event) {
-      case "single_chat":
-        const filteredUsers = users.filter((elem) => elem.username == event.to);
-        if (filteredUsers.length > 0) {
-          filteredUsers.forEach((socketItem) => {
-            socket.broadcast.to(socketItem.socketId).emit("onMessage", {
-              message: event.message,
-              from: user,
-            });
-            console.log(
-              `user ${user.username} sent a message to ${socketItem.username}`
-            );
-          });
-        } else {
-          sendMessageOffline(user.userId, event.message);
-          console.log(
-            `user ${user.username} sent a offline message to ${event.to}`
-          );
-        }
-      case "room_chat":
-        io.to(`ROOMID::${event.roomId}`).emit("onMessage", {
-          message: event.message,
-          from: user,
-          roomId: event.roomId,
-        });
-        saveMessagesInRoom(event.roomId, user.userId, event.message);
-      case "private_chat":
-        break;
-      case "one_way_chat":
-        break;
-      case "bot_chat":
-        break;
-      default:
-        break;
-    }
-  });
-
-  /* UPDATE PUBLIC MESSAGE */
-  socket.on("update-public-message", (event) => {
-    //
-  });
-
-  /* DELETE PUBLIC MESSAGE */
-  socket.on("delete-public-message", (event) => {
-    //
-  });
-
-  /* SEND ROOM MESSAGE */
-  socket.on("send-room-message", async ({ roomId, message }) => {
+  /* SEND MESSAGE ON ROOM CHAT */
+  socket.on("send-room-chat", async ({ roomId, message }) => {
     try {
       const { senderId, content } = message;
       const room = await Room.findById(roomId);
@@ -252,12 +170,12 @@ io.on("connection", async (socket) => {
   });
 
   /* UPDATE ROOM MESSAGE */
-  socket.on("delete-public-message", (event) => {
+  socket.on("delete-peer-to-peer-message", (event) => {
     //
   });
 
   /* DELETE ROOM MESSAGE */
-  socket.on("delete-public-message", (event) => {
+  socket.on("delete-peer-to-peer-message", (event) => {
     //
   });
 
@@ -276,8 +194,8 @@ io.on("connection", async (socket) => {
     //
   });
 
-  /* JOIN A ROOM */
-  socket.on("join-room", async (roomId) => {
+  /* JOIN A ROOM CHAT */
+  socket.on("join-room-chat", async (roomId) => {
     try {
       const room = await Room.findById(roomId);
       if (!room) {
@@ -294,26 +212,10 @@ io.on("connection", async (socket) => {
     }
   });
 
-  /* LEAVE A ROOM */
+  /* LEAVE A ROOM CHAT */
   socket.on("leave-room", (roomId) => {
     socket.leave(roomId);
     roomSocket[roomId] = roomSocket[roomId].filter((s) => s !== socket);
-  });
-
-  /* USER NETWORK STATUS */
-  socket.on("user-status", (event) => {
-    switch (event.status) {
-      case "online":
-        break;
-      case "offline":
-        break;
-      case "typing":
-        break;
-      case "sending_file":
-        break;
-      default: // OFFLINE
-        break;
-    }
   });
 
   /* DISCONNECT */

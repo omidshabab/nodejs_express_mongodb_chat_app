@@ -1,4 +1,4 @@
-const httpStatus = {
+const HTTP_STATUS = {
   CONTINUE: 100,
   OK: 200,
   CREATED: 201,
@@ -18,4 +18,4 @@ const httpStatus = {
   GATEWAY_TIMEOUT: 504,
 };
 
-module.exports = httpStatus;
+module.exports = HTTP_STATUS;
