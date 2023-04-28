@@ -1,8 +1,11 @@
 const PeerToPeerChat = require("../../models/Chats/PeerToPeer");
 
-exports.getChats = async (req, res) => {
+/* CREATE */
+
+/* READ */
+const getChats = async (req, res) => {
   try {
-    const { from, to } = req.query;
+    const { from, to } = req.body;
 
     const chats = await PeerToPeerChat.find({
       $or: [
@@ -12,17 +15,13 @@ exports.getChats = async (req, res) => {
     }).sort({ createdAt: 1 });
 
     res.status(200).json({ chats });
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
     res.status(500).json({ message: "Internal server error" });
   }
 };
 
-exports.saveChat = async (from, to, message) => {
-  try {
-    const chat = new PeerToPeerChat({ from, to, message });
-    await chat.save();
-  } catch (error) {
-    console.error(error);
-  }
-};
+/* UPDATE */
+
+/* DELETE */
+
+exports.module = { getChats };

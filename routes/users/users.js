@@ -16,6 +16,7 @@ const {
   checkUsername,
   getUserNotifications,
   getUserImages,
+  getUserChats,
 } = require("../../controllers/users/users.js");
 const { verifyToken } = require("../../middlewares/auth.js");
 
@@ -27,8 +28,9 @@ router.post("/:userId", createUserToken);
 /* READ */
 router.get("/:username", getUser);
 router.get("/:userId/verify/:token", getUserToken);
-router.get("/followers/:userId", getUserFollowers);
+router.get("/:userId/followers", getUserFollowers);
 router.get("/:userId/followings", getUserFollowings);
+router.get("/:userId/chats", getUserChats);
 router.get("/:userId/coupons", getUserCoupons);
 router.get("/:userId/links", getUserLinks);
 router.get("/:userId/notifications", getUserNotifications);

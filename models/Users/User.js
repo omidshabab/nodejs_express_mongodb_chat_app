@@ -88,6 +88,11 @@ const UserSchema = Schema(
       enum: USER_TYPE,
       default: USER_TYPE.PERSONAL,
     },
+    visible: {
+      type: String,
+      enum: USER_VISIBILITY,
+      default: USER_VISIBILITY.PUBLIC,
+    },
     role: {
       type: String,
       enum: USER_ROLE,

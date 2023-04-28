@@ -8,6 +8,8 @@ const path = require("path");
 const Token = require("../../models/Users/Tokens/Token.js");
 const sendEmail = require("../../utils/email.js");
 const { STATUS } = require("../../config/status.js");
+const { STATUS_CODES } = require("http");
+const HTTP_STATUS = require("../../config/status.js");
 
 /* CREATE */
 const createUserToken = async (req, res) => {
@@ -88,6 +90,21 @@ const getUserToken = async (req, res) => {
   }
 };
 
+const getUserChats = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await User.findById({ _id: userId });
+    if (!user) return res.status(400).json({ msg: "User does not exist." });
+    //
+  } catch (err) {
+    res.status(500).json({
+      status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      data: err.message,
+    });
+  }
+};
+
 const getUserCoupons = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -105,7 +122,7 @@ const getUserCoupons = async (req, res) => {
     }
   } catch (err) {
     res.status(500).json({
-      status: STATUS.Failed,
+      status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
       data: err.message,
     });
   }
@@ -410,6 +427,7 @@ module.exports = {
   getAllUsers,
   getUserFollowings,
   getUserFollowers,
+  getUserChats,
   getUserCoupons,
   getUserLinks,
   getUserNotifications,

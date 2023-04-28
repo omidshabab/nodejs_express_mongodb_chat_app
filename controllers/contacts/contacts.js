@@ -1,3 +1,4 @@
+const HTTP_STATUS = require("../../config/status.js");
 const { Contact } = require("../../models/Contacts/Contact.js");
 const { User } = require("../../models/Users/User.js");
 
@@ -20,7 +21,7 @@ const addContacts = async (req, res) => {
 
     if (user) {
       res.status(200).json({
-        status: "success",
+        status: HTTP_STATUS.OK,
         data: {
           userId: user._id,
           name: user.name,
@@ -29,13 +30,13 @@ const addContacts = async (req, res) => {
       });
     } else {
       res.status(404).json({
-        status: "failed",
+        status: HTTP_STATUS.NOT_FOUND,
         data: "User not found!",
       });
     }
   } catch (err) {
     res.status(500).json({
-      status: "failed",
+      status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
       data: err.message,
     });
   }

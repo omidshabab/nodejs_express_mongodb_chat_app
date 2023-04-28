@@ -28,7 +28,7 @@ const MessageSchema = new mongoose.Schema({
   },
   content: String,
   mediaUrl: String,
-  createdAt: {
+  date: {
     type: Date,
     default: Date.now,
   },
