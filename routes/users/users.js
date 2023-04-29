@@ -10,7 +10,6 @@ const {
   deleteUser,
   getUserCoupons,
   getUserLinks,
-  getAllUsers,
   unfollowUser,
   searchUsers,
   checkUsername,
@@ -26,7 +25,7 @@ const router = express.Router();
 router.post("/:userId", createUserToken);
 
 /* READ */
-router.get("/:username", getUser);
+router.get("/", getUser);
 router.get("/:userId/verify/:token", getUserToken);
 router.get("/:userId/followers", getUserFollowers);
 router.get("/:userId/followings", getUserFollowings);
@@ -34,7 +33,6 @@ router.get("/:userId/chats", getUserChats);
 router.get("/:userId/coupons", getUserCoupons);
 router.get("/:userId/links", getUserLinks);
 router.get("/:userId/notifications", getUserNotifications);
-router.get("/", getAllUsers);
 router.get("/:userId/images", getUserImages);
 router.get("/search/:key", searchUsers);
 router.get("/username/:username", checkUsername);

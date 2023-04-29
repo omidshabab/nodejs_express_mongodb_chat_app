@@ -39,12 +39,64 @@ const createUserToken = async (req, res) => {
 /* READ */
 const getUser = async (req, res) => {
   try {
-    const { username } = req.params;
-    const user = await User.findOne({ username });
+    const { userId, username, email, phone } = req.query;
+
+    if (
+      userId === "undefined" ||
+      username === "undefined" ||
+      email === "undefined" ||
+      phone === "undefined"
+    ) {
+      return res.status(403).json({
+        status: HTTP_STATUS.FORBIDDEN,
+        msg: "Please send at least one valid parameter!",
+      });
+    }
+
+    let user;
+    if (userId) {
+      user = await User.findById(userId);
+    } else if (username) {
+      user = await User.findOne({ username });
+    } else if (email) {
+      user = await User.findOne({ email });
+    } else if (phone) {
+      user = await User.findOne({ phone });
+    }
+
+    if (!user) {
+      return res.status(404).json({
+        status: HTTP_STATUS.NOT_FOUND,
+        msg: "User does not exist.",
+      });
+    }
+
+    res.status(200).json({
+      status: HTTP_STATUS.OK,
+      data: {
+        userId: user._id,
+        name: user.name,
+        username: user.username,
+        desc: user.desc,
+        type: user.type,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      data: err.message,
+    });
+  }
+};
+
+const getUserByPhone = async (req, res) => {
+  try {
+    const { phone } = req.params;
+    const user = await User.findOne({ phone });
 
     if (user) {
       res.status(200).json({
-        status: "success",
+        status: HTTP_STATUS.OK,
         data: {
           userId: user._id,
           name: user.name,
@@ -55,13 +107,13 @@ const getUser = async (req, res) => {
       });
     } else {
       res.status(404).json({
-        status: "failed",
+        status: HTTP_STATUS.NOT_FOUND,
         data: "User not found!",
       });
     }
   } catch (err) {
     res.status(500).json({
-      status: "failed",
+      status: HTTP_STATUS.BAD_REQUEST,
       data: err.message,
     });
   }
@@ -374,24 +426,25 @@ const unfollowUser = async (req, res) => {
 const updateUser = async (req, res) => {
   try {
     const { userId } = req.params;
-    const { password } = req.body;
+    const { pass } = req.query;
+
     const user = await User.findById({ _id: userId });
     if (!user) return res.status(400).json({ msg: "User does not exist." });
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(pass, user.password);
     if (!isMatch) return res.status(400).json({ msg: "Invalid credentials." });
 
     await User.findByIdAndUpdate(userId, {
       $set: req.body,
     });
 
-    res.status(204).json({
-      status: "success",
+    res.status(200).json({
+      status: HTTP_STATUS.OK,
       data: "Account has been updated!",
     });
   } catch (err) {
     res.status(500).json({
-      status: STATUS.Failed,
+      status: HTTP_STATUS.BAD_REQUEST,
       data: err.message,
     });
   }
@@ -409,10 +462,10 @@ const deleteUser = async (req, res) => {
     if (!isMatch) return res.status(400).json({ msg: "Invalid credentials." });
 
     await User.findByIdAndDelete(userId);
-    res.status(200).json("Account has been deleted!");
+    res.status(200).json(HTTP_STATUS.OK, "Account has been deleted!");
   } catch (err) {
     res.status(500).json({
-      status: STATUS.Failed,
+      status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
       data: err.message,
     });
   }
@@ -432,6 +485,7 @@ module.exports = {
   getUserLinks,
   getUserNotifications,
   getUser,
+  getUserByPhone,
   getUserToken,
   getUserImages,
   searchUsers,

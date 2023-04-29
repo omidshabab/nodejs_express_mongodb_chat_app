@@ -51,11 +51,7 @@ const connectSocket = (server) => {
 
     /* SEND MESSAGE ON PEER TO PEER CHAT */
     socket.on("send-peer-to-peer", async ({ to, message }) => {
-      const toUser = await User.findById(to);
-      if (!toUser) {
-        socket.disconnect();
-        return;
-      }
+      console.log(`Socket id is: ${socket.id}`);
 
       const newMessage = Message({
         senderId: userId,
@@ -86,15 +82,13 @@ const connectSocket = (server) => {
 
       //
 
-      const existingUserChat = landinaAccountDB.collection("User").findOne(
-        {
-          chats: { $in: [existingPeerToPeerChat] },
-        },
-        { id: user._id }
-      );
+      const existingUserChat = User.findOne({
+        id: user._id,
+        chats: { $all: [existingPeerToPeerChat._id] },
+      });
       console.log(`existingUserChat is: ${existingUserChat}`);
       if (!existingUserChat) {
-        user.chats.populate(existingPeerToPeerChat);
+        user.chats.push(existingPeerToPeerChat);
         await user.save();
       } else {
         console.log(`user chats already exist`);
@@ -103,12 +97,15 @@ const connectSocket = (server) => {
 
       //
 
-      const existingToUserChat = landinaAccountDB.collection("User").findOne(
-        {
-          chats: { $in: [existingPeerToPeerChat] },
-        },
-        { id: toUser._id }
-      );
+      const toUser = await User.findById(to);
+      if (!toUser) {
+        socket.disconnect();
+        return;
+      }
+      const existingToUserChat = User.findOne({
+        id: toUser._id,
+        chats: { $all: [existingPeerToPeerChat._id] },
+      });
       console.log(`existingToUserChat is: ${existingToUserChat}`);
       if (!existingToUserChat) {
         toUser.chats.push(existingPeerToPeerChat);
