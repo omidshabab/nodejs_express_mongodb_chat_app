@@ -1,14 +1,12 @@
 const { User } = require("../../models/Users/User.js");
-const Coupon = require("../../models/Coupons/Coupon.js");
+// const Coupon = require("../../models/Coupons/Coupon.js");
 const bcrypt = require("bcrypt");
 const crypto = import("crypto");
-const Link = require("../../models/Links/Link.js");
+// const Link = require("../../models/Links/Link.js");
 const Notification = require("../../models/Notifications/Notification.js");
 const path = require("path");
 const Token = require("../../models/Users/Tokens/Token.js");
 const sendEmail = require("../../utils/email.js");
-const { STATUS } = require("../../config/status.js");
-const { STATUS_CODES } = require("http");
 const HTTP_STATUS = require("../../config/status.js");
 
 /* CREATE */

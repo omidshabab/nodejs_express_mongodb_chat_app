@@ -12,12 +12,6 @@ const path = require("path");
 const { fileURLToPath } = require("url");
 const authRoutes = require("./routes/auth/auth.js");
 const userRoutes = require("./routes/users/users.js");
-const linkRoutes = require("./routes/links/links.js");
-const contactsRoutes = require("./routes/contacts/contacts.js");
-const taskRoutes = require("./routes/tasks/tasks.js");
-const locationRoutes = require("./routes/links/links.js");
-const storyRoutes = require("./routes/links/links.js");
-const fontRoutes = require("./routes/links/links.js");
 const notificationRoutes = require("./routes/notifications/notifications.js");
 const { verifyAPIKey } = require("./middlewares/auth.js");
 const mongoose = require("mongoose");
@@ -38,12 +32,6 @@ app.use("/assets", express.static(path.join(__dirname, "peer-to-peer/assets")));
 /* ROUTES */
 app.use("/auth", authRoutes);
 app.use("/users", verifyAPIKey, userRoutes);
-app.use("/links", verifyAPIKey, linkRoutes);
-app.use("/contacts", verifyAPIKey, contactsRoutes);
-app.use("/tasks", verifyAPIKey, taskRoutes);
-app.use("/locations", verifyAPIKey, locationRoutes);
-app.use("/stories", verifyAPIKey, storyRoutes);
-app.use("/fonts", verifyAPIKey, fontRoutes);
 app.use("/notifications", verifyAPIKey, notificationRoutes);
 
 /* DATABASE */
