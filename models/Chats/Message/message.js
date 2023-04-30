@@ -26,6 +26,10 @@ const MessageSchema = new mongoose.Schema({
     enum: MESSAGE_TYPES,
     default: MESSAGE_TYPES.TEXT,
   },
+  topic: {
+    type: String,
+    default: "general",
+  },
   content: String,
   mediaUrl: String,
   date: {

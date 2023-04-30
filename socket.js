@@ -24,7 +24,7 @@ const connectSocket = (server) => {
     }
 
     connectedUsers.push(user);
-    console.log(`a new socket connection (${user.username}: ${user.userId})`);
+    console.log(`a new socket connection (${user.username}: ${user._id})`);
 
     /* SEND MESSAGE ON PRIVATE CHAT */
     socket.on("send-private", (event) => {
