@@ -40,7 +40,7 @@ router.get("/username/:username", checkUsername);
 /* UPDATE */
 router.put("/:userId/follow/:myId", verifyToken, followUser);
 router.put("/:userId/unfollow/:id", verifyToken, unfollowUser);
-router.put("/:userId", verifyToken, updateUser);
+router.put("/:userId", /* verifyToken, */ updateUser);
 
 /* DELETE */
 router.delete("/:userId", verifyToken, deleteUser);

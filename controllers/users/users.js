@@ -28,7 +28,7 @@ const createUserToken = async (req, res) => {
     res.send("An Email sent to your account please verify");
   } catch (err) {
     res.status(500).json({
-      status: STATUS.Failed,
+      status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
       data: err.message,
     });
   }
@@ -424,13 +424,9 @@ const unfollowUser = async (req, res) => {
 const updateUser = async (req, res) => {
   try {
     const { userId } = req.params;
-    const { pass } = req.query;
 
     const user = await User.findById({ _id: userId });
     if (!user) return res.status(400).json({ msg: "User does not exist." });
-
-    const isMatch = await bcrypt.compare(pass, user.password);
-    if (!isMatch) return res.status(400).json({ msg: "Invalid credentials." });
 
     await User.findByIdAndUpdate(userId, {
       $set: req.body,

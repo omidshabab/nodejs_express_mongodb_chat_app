@@ -31,7 +31,7 @@ app.use("/assets", express.static(path.join(__dirname, "peer-to-peer/assets")));
 
 /* ROUTES */
 app.use("/auth", authRoutes);
-app.use("/users", verifyAPIKey, userRoutes);
+app.use("/users", /* verifyAPIKey, */ userRoutes);
 app.use("/notifications", verifyAPIKey, notificationRoutes);
 
 /* DATABASE */
