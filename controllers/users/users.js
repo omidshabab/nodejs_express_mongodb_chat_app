@@ -75,7 +75,7 @@ const getUser = async (req, res) => {
         userId: user._id,
         name: user.name,
         username: user.username,
-        desc: user.desc,
+        bio: user.bio,
         type: user.type,
       },
     });
