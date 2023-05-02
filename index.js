@@ -1,5 +1,9 @@
 const express = require("express");
+const session = require("express-session");
 const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
+const passport = require("passport");
+const LocalStrategy = require("passport-local").Strategy;
 const cors = require("cors");
 const dotenv = require("dotenv");
 const helmet = require("helmet");
@@ -21,6 +25,17 @@ const { connectSocket } = require("./socket.js");
 /* CONFIGURATIONS */
 dotenv.config();
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: true,
+    saveUninitialized: false,
+  })
+);
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(helmet());
 app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 app.use(morgan("common"));

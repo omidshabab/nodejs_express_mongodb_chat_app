@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Joi = require("joi");
 const { landinaAccountDB } = require("../../config/database");
+const { ObjectId } = mongoose.Types;
 const Schema = mongoose.Schema;
 
 const USER_VISIBILITY = {
@@ -30,6 +31,10 @@ const CART_TYPE = {
 
 const UserSchema = Schema(
   {
+    _id: {
+      type: ObjectId,
+      required: true,
+    },
     name: {
       type: String,
       trim: true,
