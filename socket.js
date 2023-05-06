@@ -6,40 +6,57 @@ const PeerToPeerChat = require("./models/Chats/PeerToPeer");
 let io;
 const connectedUsers = [];
 
+class SocketUser {
+  constructor({ socketId, userId, username, token, name }) {
+    this.socketId = socketId;
+    this.userId = userId;
+    this.username = username;
+    this.token = token;
+    this.name = name;
+  }
+}
+
+module.exports = SocketUser;
+
 const connectSocket = (server) => {
-  io = socket(server, {
-    cors: {
-      origin: "*",
-    },
-  });
+  io = socket(server);
 
   io.on("connection", async (socket) => {
     const userId = socket.handshake.query.userId;
 
-    const user = await User.findById(userId);
-    if (!user) {
+    const existingUser = await User.findById(userId);
+    if (!existingUser) {
       socket.disconnect();
       return;
     }
 
-    connectedUsers.push(user);
-    console.log(
-      `new socket connection (${user.username}: ${user._id}), socket.id is (${socket.id})`
-    );
-
-    const userChats = PeerToPeerChat.watch();
-    io.on("user-chats", (event) => {
-      console.log("Change detected:", event);
-      io.emit("user-chats", userChats);
+    const user = new SocketUser({
+      socketId: socket.id,
+      userId: existingUser._id,
+      username: existingUser.username,
+      name: existingUser.name,
+      // token: token,
     });
+
+    connectedUsers.push(user);
+    console.log(`new socket connection (${user.username}: ${user.userId}))`);
 
     /* SEND MESSAGE ON PRIVATE CHAT */
     socket.on("send-private", async (event) => {
-      io.to(socket.id).emit("message", {
-        message: event.message,
-        from: user,
-      });
-      console.log(`user ${userId} sent a message to ${socket.id}`);
+      const filteredUsers = connectedUsers.filter(
+        (elem) => elem.userId == event.to
+      );
+      if (filteredUsers.length > 0) {
+        filteredUsers.forEach((socketItem) => {
+          socket.broadcast.to(socketItem.socketId).emit("onMessage", {
+            message: event.message,
+            from: user,
+          });
+          console.log(
+            `user ${user.userId} sent a message to ${socketItem.socketId} > ${event.message}`
+          );
+        });
+      }
     });
 
     /* SEND MESSAGE ON PEER TO PEER CHAT */
@@ -52,40 +69,28 @@ const connectSocket = (server) => {
 
       //
 
+      const filteredUsers = connectedUsers.filter(
+        (elem) => elem.userId == event.to
+      );
+
+      filteredUsers.forEach((socketItem) => {
+        socket.broadcast.to(socketItem.socketId).emit("onMessage", {
+          message: event.message,
+          from: user,
+        });
+        console.log(
+          `user ${user.userId} sent a message to ${socketItem.socketId} > ${event.message}`
+        );
+      });
+
+      //
+
       const newMessage = Message({
         senderId: userId,
         content: event.message,
         toId: event.to,
       });
       await newMessage.save();
-
-      //
-
-      // io.to(socket.id).emit("message", {
-      //   message: event.message,
-      //   from: userId,
-      // });
-      // console.log(
-      //   `user ${user.id} sent a message to ${socket.id} > ${event.message}`
-      // );
-
-      socket.to(socket.id).emit("message", {
-        message: event.message,
-        from: userId,
-      });
-      console.log(
-        `user ${user.id} sent a message to ${socket.id} > ${event.message}`
-      );
-
-      // for (const user of connectedUsers) {
-      //   io.to(socket.id).emit("message", {
-      //     message: event.message,
-      //     from: userId,
-      //   });
-      //   console.log(
-      //     `user ${user.id} sent a message to ${socket.id} > ${event.message}`
-      //   );
-      // }
 
       //
 
@@ -107,37 +112,32 @@ const connectSocket = (server) => {
 
       //
 
-      const newUserChat = User({
-        chats: [existingPeerToPeerChat],
+      const existingUserChat = await User.findOne({
+        _id: user.userId,
+        chats: existingPeerToPeerChat,
       });
 
-      const existingUserChat = await User.findOne({
-        id: user._id,
-        chats: { $all: [existingPeerToPeerChat] },
-      });
-      console.log("User is: ${user}");
-      if (existingUserChat) {
-        existingUserChat.chats.push(existingPeerToPeerChat);
-        await existingUserChat.save();
-      } else {
-        await newUserChat.save();
+      if (!existingUserChat) {
+        await User.updateOne(
+          { _id: user.userId },
+          { $push: { chats: existingPeerToPeerChat } }
+        );
+        console.log(`New user chat saved`);
       }
 
       //
 
-      const newToUserChat = User({
-        chats: [existingPeerToPeerChat],
+      const existingToUserChat = await User.findOne({
+        _id: toUser._id,
+        chats: existingPeerToPeerChat,
       });
 
-      const existingToUserChat = await User.findOne({
-        id: user._id,
-        chats: { $all: [existingPeerToPeerChat] },
-      });
-      if (existingToUserChat) {
-        existingToUserChat.chats.push(existingPeerToPeerChat);
-        await existingToUserChat.save();
-      } else {
-        await newToUserChat.save();
+      if (!existingToUserChat) {
+        await User.updateOne(
+          { _id: toUser._id },
+          { $push: { chats: existingPeerToPeerChat } }
+        );
+        console.log(`New to user chat saved`);
       }
     });
 

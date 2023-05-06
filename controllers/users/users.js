@@ -146,6 +146,8 @@ const getUserChats = async (req, res) => {
 
     const user = await User.findById({ _id: userId });
     if (!user) return res.status(400).json({ msg: "User does not exist." });
+
+    res.status(200).json(user.chats);
     //
   } catch (err) {
     res.status(500).json({

@@ -31,10 +31,6 @@ const CART_TYPE = {
 
 const UserSchema = Schema(
   {
-    _id: {
-      type: ObjectId,
-      required: true,
-    },
     name: {
       type: String,
       trim: true,
