@@ -109,6 +109,12 @@ const UserSchema = Schema(
         ref: "Link",
       },
     ],
+    stories: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Story",
+      },
+    ],
     coupons: [
       {
         type: Schema.Types.ObjectId,

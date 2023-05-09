@@ -39,160 +39,123 @@ const connectSocket = (server) => {
     });
 
     connectedUsers.push(user);
-    console.log(`new socket connection (${user.username}: ${user.userId}))`);
+    console.log(`new socket connection (${user.username})`);
 
     /* SEND MESSAGE ON PRIVATE CHAT */
-    socket.on("send-private", async (event) => {
-      const filteredUsers = connectedUsers.filter(
-        (elem) => elem.userId == event.to
-      );
-      if (filteredUsers.length > 0) {
-        filteredUsers.forEach((socketItem) => {
-          socket.broadcast.to(socketItem.socketId).emit("onMessage", {
-            message: event.message,
-            from: user,
-          });
-          console.log(
-            `user ${user.userId} sent a message to ${socketItem.socketId} > ${event.message}`
-          );
-        });
-      }
-    });
-
-    /* SEND MESSAGE ON PEER TO PEER CHAT */
-    socket.on("send-peer-to-peer", async (event) => {
-      const toUser = await User.findById(event.to);
-      if (!toUser) {
-        socket.disconnect();
-        return;
-      }
-
-      //
-
-      const filteredUsers = connectedUsers.filter(
-        (elem) => elem.userId == event.to
-      );
-
-      filteredUsers.forEach((socketItem) => {
-        socket.broadcast.to(socketItem.socketId).emit("onMessage", {
+    socket.on("send-message", async (event) => {
+      if (!!event.roomId) {
+        io.to(`ROOMID::${event.roomId}`).emit("onMessage", {
           message: event.message,
           from: user,
+          roomId: event.roomId,
         });
-        console.log(
-          `user ${user.userId} sent a message to ${socketItem.socketId} > ${event.message}`
-        );
-      });
-
-      //
-
-      const newMessage = Message({
-        senderId: userId,
-        content: event.message,
-        toId: event.to,
-      });
-      await newMessage.save();
-
-      //
-
-      const newPeerToPeerChat = PeerToPeerChat({
-        between: [userId, event.to],
-        messages: [newMessage],
-      });
-
-      const existingPeerToPeerChat = await PeerToPeerChat.findOne({
-        between: { $all: [userId, event.to] },
-      });
-
-      if (existingPeerToPeerChat) {
-        existingPeerToPeerChat.messages.push(newMessage);
-        await existingPeerToPeerChat.save();
-      } else {
-        await newPeerToPeerChat.save();
-      }
-
-      //
-
-      const existingUserChat = await User.findOne({
-        _id: user.userId,
-        chats: existingPeerToPeerChat,
-      });
-
-      if (!existingUserChat) {
-        await User.updateOne(
-          { _id: user.userId },
-          { $push: { chats: existingPeerToPeerChat } }
-        );
-        console.log(`New user chat saved`);
-      }
-
-      //
-
-      const existingToUserChat = await User.findOne({
-        _id: toUser._id,
-        chats: existingPeerToPeerChat,
-      });
-
-      if (!existingToUserChat) {
-        await User.updateOne(
-          { _id: toUser._id },
-          { $push: { chats: existingPeerToPeerChat } }
-        );
-        console.log(`New to user chat saved`);
-      }
-    });
-
-    /* SEND MESSAGE ON ROOM CHAT */
-    socket.on("send-room", async ({ roomId, message }) => {
-      try {
-        const { senderId, content } = message;
-        const room = await Room.findById(roomId);
-
-        if (!room) {
-          return socket.emit("error", "Room not found");
+        //
+      } else if (!!event.peerId) {
+        const toUser = await User.findById(event.to);
+        if (!toUser) {
+          socket.disconnect();
+          return;
         }
 
-        const newMessage = new Message({
-          senderId,
-          roomId,
-          content,
+        //
+
+        socket.to(event.peerId).emit("onMessage", {
+          message: event.message,
+          from: user,
+          peerId: event.roomId,
+        });
+        console.log(
+          `user ${user.username} sent a message to ${toUser.username} > ${event.message}`
+        );
+
+        //
+
+        const newMessage = Message({
+          senderId: userId,
+          content: event.message,
+          toId: event.to,
         });
         await newMessage.save();
 
-        room.messages.push(newMessage._id);
-        await room.save();
-      } catch (err) {
-        console.log(err);
-        socket.emit("error", "Server error");
-      }
-    });
+        //
 
-    /* SEND NOTIFICATION */
-    socket.on("notification", (event) => {
-      //
+        const newPeerToPeerChat = PeerToPeerChat({
+          between: [userId, event.to],
+          messages: [newMessage],
+        });
+
+        const existingPeerToPeerChat = await PeerToPeerChat.findOne({
+          between: { $all: [userId, event.to] },
+        });
+
+        if (existingPeerToPeerChat) {
+          existingPeerToPeerChat.messages.push(newMessage);
+          await existingPeerToPeerChat.save();
+        } else {
+          await newPeerToPeerChat.save();
+        }
+
+        //
+
+        const existingUserChat = await User.findOne({
+          _id: user.userId,
+          chats: existingPeerToPeerChat,
+        });
+
+        if (!existingUserChat) {
+          await User.updateOne(
+            { _id: user.userId },
+            { $push: { chats: existingPeerToPeerChat } }
+          );
+          console.log(`New user chat saved`);
+        }
+
+        //
+
+        const existingToUserChat = await User.findOne({
+          _id: toUser._id,
+          chats: existingPeerToPeerChat,
+        });
+
+        if (!existingToUserChat) {
+          await User.updateOne(
+            { _id: toUser._id },
+            { $push: { chats: existingPeerToPeerChat } }
+          );
+          console.log(`New to user chat saved`);
+        }
+      } else if (!!event.botId) {
+        //
+      } else if (!!event.onewayId) {
+        //
+      } else {
+        const filteredUsers = connectedUsers.filter(
+          (elem) => elem.userId == event.to
+        );
+        if (filteredUsers.length > 0) {
+          filteredUsers.forEach((socketItem) => {
+            socket.broadcast.to(socketItem.socketId).emit("onMessage", {
+              message: event.message,
+              from: user,
+            });
+            console.log(
+              `user ${user.userId} sent a message to ${socketItem.socketId} > ${event.message}`
+            );
+          });
+        }
+      }
     });
 
     /* JOIN A ROOM CHAT */
-    socket.on("join-room", async (roomId) => {
-      try {
-        const room = await Room.findById(roomId);
-        if (!room) {
-          return socket.emit("error", "Room not found");
-        }
-        socket.join(roomId);
-        roomSocket[roomId] = roomSocket.roomId || [];
-        roomSocket[roomId].push(socket);
-
-        const messages = await Message.find({ roomId }).populate("senderId");
-        socket.emit("messages", messages);
-      } catch (err) {
-        //
-      }
+    socket.on("join-room", async (event) => {
+      socket.join(`ROOMID::${event.roomId}`);
+      console.log(`user ${user.userId} join to a room ${event.roomId}`);
     });
 
     /* LEAVE A ROOM CHAT */
-    socket.on("leave-room", (roomId) => {
-      socket.leave(roomId);
-      roomSocket[roomId] = roomSocket[roomId].filter((s) => s !== socket);
+    socket.on("leave-room", (event) => {
+      socket.leave(`ROOMID::${event.roomId}`);
+      console.log(`user ${user.userId} left the room ${event.roomId}`);
     });
 
     /* DISCONNECT */

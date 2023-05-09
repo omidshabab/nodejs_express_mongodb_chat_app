@@ -1,15 +1,17 @@
+const HTTP_STATUS = require("../../config/status");
 const RoomChat = require("../../models/Chats/Room");
 
 /* CREATE */
 const createRoom = async (req, res) => {
   try {
-    const { name, users } = req.body;
-    const room = new Room({
-      name,
-      users,
+    const { members } = req.body;
+
+    const newRoom = new RoomChat({
+      members: members,
     });
-    await RoomChat.save();
-    res.json({ room });
+    await newRoom.save();
+
+    res.status(201).json({ status: HTTP_STATUS.CREATED });
   } catch (err) {
     console.error(err);
     res.status(500).send("Server error");

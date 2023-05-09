@@ -7,7 +7,23 @@ const RoomSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    users: [
+    creator: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+    owners: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+    managers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+    members: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
@@ -23,5 +39,5 @@ const RoomSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Room = landinaChatDB.model("Room", RoomSchema);
-module.exports = Room;
+const RoomChat = landinaChatDB.model("RoomChat", RoomSchema);
+module.exports = RoomChat;

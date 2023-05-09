@@ -16,6 +16,7 @@ const path = require("path");
 const { fileURLToPath } = require("url");
 const authRoutes = require("./routes/auth/auth.js");
 const userRoutes = require("./routes/users/users.js");
+const contactsRoutes = require("./routes/contacts/contacts.js");
 const notificationRoutes = require("./routes/notifications/notifications.js");
 const { verifyAPIKey } = require("./middlewares/auth.js");
 const mongoose = require("mongoose");
@@ -47,6 +48,7 @@ app.use("/assets", express.static(path.join(__dirname, "peer-to-peer/assets")));
 /* ROUTES */
 app.use("/auth", authRoutes);
 app.use("/users", /* verifyAPIKey, */ userRoutes);
+app.use("/contacts", contactsRoutes);
 app.use("/notifications", verifyAPIKey, notificationRoutes);
 
 /* DATABASE */
