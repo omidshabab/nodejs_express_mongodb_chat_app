@@ -194,10 +194,13 @@ const loginUsername = async (req, res) => {
     res.status(200).json({
       status: "success",
       data: {
-        token,
-        username: user.username,
+        userId: user._id,
         name: user.name,
+        username: user.username,
+        email: user.email,
         desc: user.desc,
+        type: user.type,
+        token,
       },
     });
   } catch (err) {
