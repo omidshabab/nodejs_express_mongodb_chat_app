@@ -9,6 +9,7 @@
   "author": "Landina.co",
   "license": "ISC",
   "dependencies": {
+    "@react-email/render": "^0.0.7",
     "bcrypt": "^5.1.0",
     "body-parser": "^1.20.1",
     "cookie-parser": "^1.4.6",

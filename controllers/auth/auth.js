@@ -253,12 +253,10 @@ const loginEmail = async (req, res) => {
 
 const loginPhone = async (req, res) => {
   try {
-    const { username, password } = req.body;
-    let user = await User.findOne({ username: username });
-    if (username == undefined || password == undefined)
-      return res
-        .status(400)
-        .json({ msg: "Please send all the required values!" });
+    const { phone } = req.body;
+    let user = await User.findOne({ phone: phone });
+    if (phone == undefined)
+      return res.status(400).json({ msg: "Please send your phone number!" });
     if (!user) return res.status(400).json({ msg: "User does not exist." });
 
     const isMatch = await bcrypt.compare(password, user.password);
