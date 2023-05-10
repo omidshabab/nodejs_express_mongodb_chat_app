@@ -6,7 +6,6 @@ const crypto = import("crypto");
 const Notification = require("../../models/Notifications/Notification.js");
 const path = require("path");
 const Token = require("../../models/Users/Tokens/Token.js");
-const sendEmail = require("../../utils/email.js");
 const HTTP_STATUS = require("../../config/status.js");
 
 /* CREATE */
@@ -23,7 +22,7 @@ const createUserToken = async (req, res) => {
     }).save();
 
     const message = `${process.env.BASE_URL}/users/${user.id}/verify/${token.token}`;
-    await sendEmail(user.email, "Verify Email", message);
+    // await sendEmail(user.email, "Verify Email", message);
 
     res.send("An Email sent to your account please verify");
   } catch (err) {

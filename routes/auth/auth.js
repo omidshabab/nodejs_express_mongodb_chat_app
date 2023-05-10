@@ -3,14 +3,13 @@ const {
   signupEmail,
   signupPhone,
   signupGoogle,
-  signupWallet,
+  signupGithub,
   loginUsername,
   loginEmail,
   loginPhone,
   loginGoogle,
-  loginWallet,
+  loginGithub,
 } = require("../../controllers/auth/auth.js");
-const { sendOTP, verifyOTP } = require("../../utils/sms.js");
 
 const router = express.Router();
 
@@ -26,15 +25,11 @@ router.post("/validate/email", loginUsername);
 router.post("/validate/phone", loginUsername);
 router.post("/validate/token", loginUsername);
 
-/* OTP */
-router.post("/otp/send", sendOTP);
-router.post("/otp/verify", verifyOTP);
-
 /* SIGNUP */
 router.post("/signup/email", signupEmail);
 router.post("/signup/phone", signupPhone);
 router.post("/signup/google", signupGoogle);
-router.post("/signup/wallet", signupWallet);
+router.post("/signup/github", signupGithub);
 
 /* LOGIN */
 // router.get("/login", loginMethods);
@@ -42,7 +37,7 @@ router.post("/login/username", loginUsername);
 router.post("/login/email", loginEmail);
 router.post("/login/phone", loginPhone);
 router.post("/login/google", loginGoogle);
-router.post("/login/wallet", loginWallet);
+router.post("/login/github", loginGithub);
 
 /* FORGET */
 router.post("/forget", loginUsername);
