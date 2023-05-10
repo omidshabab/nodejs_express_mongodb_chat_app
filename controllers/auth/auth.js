@@ -215,7 +215,7 @@ const loginEmail = async (req, res) => {
 
     // SEND EMAIL
     await transporter.sendMail({
-      from: process.env.USERNAME,
+      from: '"Landina LLC" <hey@landina.co>',
       to: user.email,
       subject: "New Login to your Landina Account",
       html: `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">

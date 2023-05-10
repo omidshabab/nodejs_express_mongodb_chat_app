@@ -1,14 +1,3 @@
 {
-  "pricing_table": "Pricing Tables",
-  "basic": "Basic",
-  "pro": "Pro",
-  "premium": "Premium",
-  "storage": "Storage",
-  "email": "Emails",
-  "domain": "Domains",
-  "sign_up": "Sign Up",
-  "cost_basic": "$ 10",
-  "cost_pro": "$ 25",
-  "cost_premium": "$ 50",
-  "per_month": "per month"
+  "new_login": "New Login to your Landina Account"
 }
