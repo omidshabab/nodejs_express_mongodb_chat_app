@@ -1,6 +1,6 @@
 const nodemailer = require("nodemailer");
 
-const sendEmail = async (email, subject, text) => {
+const sendEmail = async (from, to, subject, html) => {
   try {
     const transporter = nodemailer.createTransport({
       host: process.env.HOST,
@@ -15,23 +15,15 @@ const sendEmail = async (email, subject, text) => {
     });
 
     await transporter.sendMail({
-      from: process.env.USERNAME,
-      to: email,
+      from: from,
+      to: to,
       subject: subject,
-      text: text,
+      html: html,
     });
 
-    res.status(200).json({
-      status: "success",
-      data: "Email sent. please verify.",
-    });
+    return;
   } catch (err) {
-    console.log(err.message);
-
-    res.status(500).json({
-      status: "failed",
-      data: err.message,
-    });
+    return err;
   }
 };
 

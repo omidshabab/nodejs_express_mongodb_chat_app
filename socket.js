@@ -49,7 +49,6 @@ const connectSocket = (server) => {
           from: user,
           roomId: event.roomId,
         });
-        //
       } else if (!!event.peerId) {
         const toUser = await User.findById(event.to);
         if (!toUser) {

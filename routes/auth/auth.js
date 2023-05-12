@@ -2,11 +2,13 @@ const express = require("express");
 const {
   signupEmail,
   signupPhone,
+  signupPhoneVerify,
   signupGoogle,
   signupGithub,
   loginUsername,
   loginEmail,
   loginPhone,
+  loginPhoneVerify,
   loginGoogle,
   loginGithub,
 } = require("../../controllers/auth/auth.js");
@@ -28,6 +30,7 @@ router.post("/validate/token", loginUsername);
 /* SIGNUP */
 router.post("/signup/email", signupEmail);
 router.post("/signup/phone", signupPhone);
+router.post("/signup/phone/verify", signupPhoneVerify);
 router.post("/signup/google", signupGoogle);
 router.post("/signup/github", signupGithub);
 
@@ -36,6 +39,7 @@ router.post("/signup/github", signupGithub);
 router.post("/login/username", loginUsername);
 router.post("/login/email", loginEmail);
 router.post("/login/phone", loginPhone);
+router.post("/login/phone/verify", loginPhoneVerify);
 router.post("/login/google", loginGoogle);
 router.post("/login/github", loginGithub);
 

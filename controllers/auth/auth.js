@@ -7,54 +7,57 @@ const {
 } = require("unique-username-generator");
 const { default: mongoose } = require("mongoose");
 const HTTP_STATUS = require("../../config/status.js");
-const nodemailer = require("nodemailer");
-const sendEmail = require("../../email.js");
 const transporter = require("../../config/transporter.js");
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+const verifySid = process.env.TWILIO_SERVICE_SID;
+const client = require("twilio")(accountSid, authToken);
 
 /* SIGNUP */
 const signupEmail = async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    if (email == undefined || password == undefined)
+      return res
+        .status(400)
+        .json({ msg: "Please send all requirement fields!" });
+
+    let user = await User.findOne({ email: email });
+    if (user) return res.status(400).json({ msg: "User already exist." });
+
     const salt = await bcrypt.genSalt();
     const passwordHash = await bcrypt.hash(password, salt);
 
-    if (email == undefined || password == undefined)
-      return res.status(400).json({
-        status: "Error",
-        error_code: "required fields",
-      });
+    const username = generateFromEmail(email, 3);
 
-    username = generateFromEmail(email, 3);
-
-    const user = User({
+    const newUser = User({
       _id: new mongoose.Types.ObjectId(),
       username,
       email,
       password: passwordHash,
     });
+    await newUser.save();
 
-    await user.save();
-
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
       algorithm: "HS256",
       expiresIn: process.env.JWT_EXPIRY,
     });
 
     res.status(201).json({
-      status: "success",
+      status: HTTP_STATUS.OK,
       data: {
-        userId: user._id,
-        username: user.username,
-        email: user.email,
-        desc: user.desc,
-        type: user.type,
+        userId: newUser._id,
+        username: username,
+        email: newUser.email,
+        desc: newUser.desc,
+        type: newUser.type,
         token,
       },
     });
   } catch (err) {
     res.status(500).json({
-      status: "failed",
+      status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
       data: err.message,
     });
   }
@@ -62,18 +65,71 @@ const signupEmail = async (req, res) => {
 
 const signupPhone = async (req, res) => {
   try {
-    const { countryCode, phoneNumber } = req.body;
+    const { phone } = req.body;
+    let user = await User.findOne({ phone: phone });
+    if (phone == undefined)
+      return res.status(400).json({ msg: "Please send your phone number!" });
 
-    if (countryCode == undefined || phoneNumber == undefined)
-      return res.status(400).json({
-        status: "Error",
-        error_code: "required fields",
-      });
+    if (user) return res.status(400).json({ msg: "User already exist." });
 
-    //
+    // Send verification code via Twilio
+    client.verify.v2
+      .services(verifySid)
+      .verifications.create({ to: phone, channel: "sms" });
+
+    res.status(200).json({
+      status: HTTP_STATUS.OK,
+    });
   } catch (err) {
     res.status(500).json({
-      status: "failed",
+      status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      data: err.message,
+    });
+  }
+};
+
+const signupPhoneVerify = async (req, res) => {
+  try {
+    const { phone, otp } = req.body;
+    let user = await User.findOne({ phone: phone });
+    if (phone == undefined)
+      return res.status(400).json({ msg: "Please send your phone number!" });
+
+    if (user) return res.status(400).json({ msg: "User already exist." });
+
+    const username = generateUsername("newUser", 5, 8);
+
+    const newUser = User({
+      phone,
+      username,
+    });
+
+    await newUser.save();
+
+    const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
+      algorithm: "HS256",
+      expiresIn: process.env.JWT_EXPIRY,
+    });
+
+    // Get verification code via Twilio
+    client.verify.v2
+      .services(verifySid)
+      .verificationChecks.create({ to: phone, code: otp });
+
+    res.status(201).json({
+      status: HTTP_STATUS.OK,
+      data: {
+        userId: newUser._id,
+        name: newUser.name,
+        username,
+        desc: newUser.desc,
+        type: newUser.type,
+        token,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
       data: err.message,
     });
   }
@@ -211,7 +267,6 @@ const loginEmail = async (req, res) => {
       algorithm: "HS256",
       expiresIn: process.env.JWT_EXPIRY,
     });
-    delete user.password;
 
     // SEND EMAIL
     await transporter.sendMail({
@@ -221,11 +276,11 @@ const loginEmail = async (req, res) => {
       html: `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
       <meta http-equiv="Content-Type" content="text/html charset=UTF-8" />
       <html lang="en">
-      
+
         <head></head>
         <div id="__react-email-preview" style="display:none;overflow:hidden;line-height:1px;opacity:0;max-height:0;max-width:0">Join bukinoshita on Vercel<div> ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿ ‌​‍‎‏﻿</div>
         </div>
-      
+
         <body style="margin-left:auto;margin-right:auto;margin-top:auto;margin-bottom:auto;background-color:rgb(255,255,255);font-family:ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, &quot;Helvetica Neue&quot;, Arial, &quot;Noto Sans&quot;, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;">
           <table align="center" role="presentation" cellSpacing="0" cellPadding="0" border="0" width="100%" style="max-width:37.5em;margin-left:auto;margin-right:auto;margin-top:40px;margin-bottom:40px;width:465px;border-radius:0.25rem;border-width:1px;border-style:solid;border-color:rgb(234,234,234);padding:20px">
             <tr style="width:100%">
@@ -271,7 +326,7 @@ const loginEmail = async (req, res) => {
             </tr>
           </table>
         </body>
-      
+
       </html>`, // HTML body,
     });
 
@@ -305,12 +360,51 @@ const loginPhone = async (req, res) => {
     if (!user) return res.status(400).json({ msg: "User does not exist." });
 
     // Send verification code via Twilio
-    await twilio.verify
-      .services("your_verify_service_sid")
+    client.verify.v2
+      .services(verifySid)
       .verifications.create({ to: phone, channel: "sms" });
 
     res.status(200).json({
       status: HTTP_STATUS.OK,
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      data: err.message,
+    });
+  }
+};
+
+const loginPhoneVerify = async (req, res) => {
+  try {
+    const { phone, otp } = req.body;
+    let user = await User.findOne({ phone: phone });
+    if (phone == undefined)
+      return res.status(400).json({ msg: "Please send your phone number!" });
+
+    if (!user) return res.status(400).json({ msg: "User does not exist." });
+
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      algorithm: "HS256",
+      expiresIn: process.env.JWT_EXPIRY,
+    });
+
+    // Get verification code via Twilio
+    client.verify.v2
+      .services(verifySid)
+      .verificationChecks.create({ to: phone, code: otp });
+
+    res.status(200).json({
+      status: HTTP_STATUS.OK,
+      data: {
+        userId: user._id,
+        name: user.name,
+        username: user.username,
+        email: user.email,
+        desc: user.desc,
+        type: user.type,
+        token,
+      },
     });
   } catch (err) {
     res.status(500).json({
@@ -389,11 +483,13 @@ const loginGithub = async (req, res) => {
 module.exports = {
   signupEmail,
   signupPhone,
+  signupPhoneVerify,
   signupGoogle,
   signupGithub,
   loginUsername,
   loginEmail,
   loginPhone,
+  loginPhoneVerify,
   loginGoogle,
   loginGithub,
 };
