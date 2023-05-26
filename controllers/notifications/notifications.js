@@ -1,3 +1,4 @@
+const HTTP_STATUS = require("../../config/status.js");
 const Notification = require("../../models/Notifications/Notification.js");
 const { User } = require("../../models/Users/User.js");
 
@@ -32,7 +33,7 @@ const createNotif = async (req, res) => {
     res.status(200).json(notification);
   } catch (err) {
     res.status(500).json({
-      status: STATUS.Failed,
+      status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
       data: err.message,
     });
   }
@@ -50,7 +51,7 @@ const getNotif = async (req, res) => {
     res.status(200).json(notification);
   } catch (err) {
     res.status(500).json({
-      status: STATUS.Failed,
+      status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
       data: err.message,
     });
   }
@@ -76,7 +77,7 @@ const updateNotif = async (req, res) => {
     //
   } catch (err) {
     res.status(500).json({
-      status: STATUS.Failed,
+      status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
       data: err.message,
     });
   }
@@ -88,7 +89,7 @@ const deleteNotif = async (req, res) => {
     //
   } catch (err) {
     res.status(500).json({
-      status: STATUS.Failed,
+      status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
       data: err.message,
     });
   }

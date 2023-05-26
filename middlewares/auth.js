@@ -6,7 +6,7 @@ const verifyAPIKey = async (req, res, next) => {
     next();
   } catch (err) {
     res.status(500).json({
-      status: STATUS.Failed,
+      status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
       data: err.message,
     });
   }
@@ -53,7 +53,7 @@ const verifyEmail = async (req, res, next) => {
     next();
   } catch (err) {
     res.status(500).json({
-      status: STATUS.Failed,
+      status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
       data: err.message,
     });
   }

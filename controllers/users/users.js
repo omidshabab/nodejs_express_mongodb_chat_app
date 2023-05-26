@@ -133,7 +133,7 @@ const getUserToken = async (req, res) => {
     res.send("email verified sucessfully");
   } catch (err) {
     res.status(500).json({
-      status: STATUS.Failed,
+      status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
       data: err.message,
     });
   }
@@ -196,7 +196,7 @@ const getUserLinks = async (req, res) => {
     }
   } catch (err) {
     res.status(500).json({
-      status: STATUS.Failed,
+      status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
       data: err.message,
     });
   }
@@ -221,7 +221,7 @@ const getUserNotifications = async (req, res) => {
     }
   } catch (err) {
     res.status(500).json({
-      status: STATUS.Failed,
+      status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
       data: err.message,
     });
   }
@@ -284,7 +284,24 @@ const getUserFollowings = async (req, res) => {
     }
   } catch (err) {
     res.status(500).json({
-      status: STATUS.Failed,
+      status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      data: err.message,
+    });
+  }
+};
+
+const isUserFollowed = async (req, res) => {
+  const { myId, userId } = req.params;
+  try {
+    const user = await User.findById({ _id: myId });
+      if (user.followings.includes(userId)) {
+        res.status(200).json(true);
+      } else {
+        res.status(404).json(false);
+      }
+  } catch (err) {
+    res.status(500).json({
+      status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
       data: err.message,
     });
   }
@@ -300,7 +317,7 @@ const getAllUsers = async (req, res) => {
     }
   } catch (err) {
     res.status(500).json({
-      status: STATUS.Failed,
+      status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
       data: err.message,
     });
   }
@@ -317,7 +334,7 @@ const getUserImages = async (req, res) => {
     res.sendFile(targetPath);
   } catch (err) {
     res.status(500).json({
-      status: STATUS.Failed,
+      status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
       data: err.message,
     });
   }
@@ -339,7 +356,7 @@ const searchUsers = async (req, res) => {
     }
   } catch (err) {
     res.status(500).json({
-      status: STATUS.Failed,
+      status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
       data: err.message,
     });
   }
@@ -367,7 +384,7 @@ const checkUsername = async (req, res) => {
     }
   } catch (err) {
     res.status(500).json({
-      status: STATUS.Failed,
+      status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
       data: err.message,
     });
   }
@@ -376,20 +393,20 @@ const checkUsername = async (req, res) => {
 /* UPDATE */
 const followUser = async (req, res) => {
   const { myId, userId } = req.params;
-  if (userId !== id) {
+  if (userId !== myId) {
     try {
       const user = await User.findById({ _id: myId });
       const currentUser = await User.findById({ _id: userId });
-      if (!user.followers.includes(userId)) {
-        await user.updateOne({ $push: { followers: userId } });
-        await currentUser.updateOne({ $push: { followings: myId } });
+      if (!user.followings.includes(userId)) {
+        await user.updateOne({ $push: { followings: userId } });
+        await currentUser.updateOne({ $push: { followers: myId } });
         res.status(200).json("User has been followed");
       } else {
         res.status(403).json("You already followed this account");
       }
     } catch (err) {
       res.status(500).json({
-        status: STATUS.Failed,
+        status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
         data: err.message,
       });
     }
@@ -399,21 +416,21 @@ const followUser = async (req, res) => {
 };
 
 const unfollowUser = async (req, res) => {
-  const { id, userId } = req.params;
-  if (userId !== id) {
+  const { myId, userId } = req.params;
+  if (userId !== myId) {
     try {
-      const user = await User.findById({ _id: id });
+      const user = await User.findById({ _id: myId });
       const currentUser = await User.findById({ _id: userId });
-      if (user.followers.includes(userId)) {
-        await user.updateOne({ $pull: { followers: userId } });
-        await currentUser.updateOne({ $pull: { followings: id } });
+      if (user.followings.includes(userId)) {
+        await user.updateOne({ $pull: { followings: userId } });
+        await currentUser.updateOne({ $pull: { followers: myId } });
         res.status(200).json("User has been unfollowed");
       } else {
         res.status(403).json("You didn't follow this account");
       }
     } catch (err) {
       res.status(500).json({
-        status: STATUS.Failed,
+        status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
         data: err.message,
       });
     }
@@ -475,6 +492,7 @@ module.exports = {
   getAllUsers,
   getUserFollowings,
   getUserFollowers,
+  isUserFollowed,
   getUserChats,
   getUserCoupons,
   getUserLinks,

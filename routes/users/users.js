@@ -16,6 +16,7 @@ const {
   getUserNotifications,
   getUserImages,
   getUserChats,
+  isUserFollowed,
 } = require("../../controllers/users/users.js");
 const { verifyToken } = require("../../middlewares/auth.js");
 
@@ -29,6 +30,7 @@ router.get("/", getUser);
 router.get("/:userId/verify/:token", getUserToken);
 router.get("/:userId/followers", getUserFollowers);
 router.get("/:userId/followings", getUserFollowings);
+router.get("/isfollowed/:myId/:userId", isUserFollowed);
 router.get("/:userId/chats", getUserChats);
 // router.get("/:userId/coupons", getUserCoupons);
 // router.get("/:userId/links", getUserLinks);
@@ -38,11 +40,11 @@ router.get("/search/:key", searchUsers);
 router.get("/username/:username", checkUsername);
 
 /* UPDATE */
-router.put("/:userId/follow/:myId", verifyToken, followUser);
-router.put("/:userId/unfollow/:id", verifyToken, unfollowUser);
+router.put("/follow/:myId/:userId", /* verifyToken, */ followUser);
+router.put("/unfollow/:myId/:userId", /* verifyToken, */ unfollowUser);
 router.put("/:userId", /* verifyToken, */ updateUser);
 
 /* DELETE */
-router.delete("/:userId", verifyToken, deleteUser);
+router.delete("/:userId", /* verifyToken, */ deleteUser);
 
 module.exports = router;
