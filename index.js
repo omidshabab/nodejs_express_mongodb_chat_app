@@ -12,6 +12,9 @@ const app = express();
 const http = require("http");
 const server = http.createServer(app);
 const multer = require("multer");
+const upload = multer({
+  dest: process.env.MULTER_TEMP_PATH
+})
 const path = require("path");
 const { fileURLToPath } = require("url");
 const authRoutes = require("./routes/auth/auth.js");

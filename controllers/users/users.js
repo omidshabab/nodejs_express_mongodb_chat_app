@@ -1,10 +1,9 @@
 const { User } = require("../../models/Users/User.js");
-// const Coupon = require("../../models/Coupons/Coupon.js");
 const bcrypt = require("bcrypt");
-const crypto = import("crypto");
-// const Link = require("../../models/Links/Link.js");
+const crypto = require("crypto");
 const Notification = require("../../models/Notifications/Notification.js");
 const path = require("path");
+const fs = require("fs")
 const Token = require("../../models/Users/Tokens/Token.js");
 const HTTP_STATUS = require("../../config/status.js");
 
@@ -456,11 +455,47 @@ const updateUser = async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({
-      status: HTTP_STATUS.BAD_REQUEST,
+      status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
       data: err.message,
     });
   }
 };
+
+const uploadAvatar = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await User.findById({ _id: userId });
+    if (!user) return res.status(400).json({ msg: "User does not exist." });
+
+    //
+    const tempPath = req.file.path;
+    const targetPath = path.join(__dirname, `../${process.env.MULTER_TARGET_PATH}/${userId}.jpg`);
+
+    fs.rename(tempPath, targetPath, (err)=>{
+      if(err){
+        console.log(err);
+        return res.status(400).json({
+          status: HTTP_STATUS.BAD_REQUEST,
+          data: err.message,
+        });
+      }else{
+        fs.unlink(tempPath, ()=>{})
+        return res.status(200).json({
+          status: HTTP_STATUS.OK,
+          data: "Avatar Uploaded Successfully!",
+        });
+      }
+    })
+
+    
+  } catch (err) {
+    res.status(500).json({
+      status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      data: err.message,
+    });
+  }
+}
 
 /* DELETE */
 const deleteUser = async (req, res) => {
@@ -503,4 +538,5 @@ module.exports = {
   getUserImages,
   searchUsers,
   checkUsername,
+  uploadAvatar,
 };

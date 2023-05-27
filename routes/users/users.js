@@ -17,8 +17,13 @@ const {
   getUserImages,
   getUserChats,
   isUserFollowed,
+  uploadAvatar,
 } = require("../../controllers/users/users.js");
 const { verifyToken } = require("../../middlewares/auth.js");
+const multer = require("multer");
+const upload = multer({
+  dest: process.env.MULTER_TEMP_PATH
+})
 
 const router = express.Router();
 
@@ -43,6 +48,7 @@ router.get("/username/:username", checkUsername);
 router.put("/follow/:myId/:userId", /* verifyToken, */ followUser);
 router.put("/unfollow/:myId/:userId", /* verifyToken, */ unfollowUser);
 router.put("/:userId", /* verifyToken, */ updateUser);
+router.put("/:userId", /* verifyToken, */ upload.single("avatar"), uploadAvatar);
 
 /* DELETE */
 router.delete("/:userId", /* verifyToken, */ deleteUser);

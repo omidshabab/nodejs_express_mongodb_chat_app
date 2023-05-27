@@ -1,7 +1,7 @@
 const socket = require("socket.io");
-const { User } = require("./models/Users/User");
-const Message = require("./models/Chats/Message/Message");
-const PeerToPeerChat = require("./models/Chats/PeerToPeer");
+const { User } = require("./models/Users/User.js");
+const Message = require("./models/Chats/Message/message.js");
+const PeerToPeerChat = require("./models/Chats/PeerToPeer.js");
 
 let io;
 const connectedUsers = [];
