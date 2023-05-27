@@ -1,5 +1,5 @@
 const { landinaChatDB } = require("../../../config/database");
-const Message = require("../../../models/Chats/Message/Message");
+const Message = require("../../../models/Chats/Message/message.js");
 
 const createMessage = async (senderId, toId, message) => {
   if (
