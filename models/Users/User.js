@@ -66,6 +66,9 @@ const UserSchema = Schema(
       min: 6,
       trim: true,
     },
+    profileImage:{
+      type: String,
+    },
     images: [
       {
         type: Schema.Types.ObjectId,

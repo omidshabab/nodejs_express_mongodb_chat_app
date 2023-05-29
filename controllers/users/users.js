@@ -228,39 +228,24 @@ const getUserNotifications = async (req, res) => {
 
 const getUserFollowers = async (req, res) => {
   try {
-    const { userId } = req.params;
-    const currentUser = await User.findById(userId);
+    const currentUser = await User.findById(req.params.userId);
 
-    // if (currentUser) return res.status(200).json("success");
+    // query for follower
+    const query = { _id: currentUser.followers };
 
-    // Number of followers
-    User.countDocuments({ id: currentUser.followers }, async (err, count) => {
-      try {
-        // Query for followers
-        const query = { id: currentUser.followers };
-
-        const userFollowers = await User.find(query).sort({
-          $natural: -1,
-        });
-
-        if (userFollowers.length === 0) {
-          res.status(404).json("There is any follower here");
-        } else {
-          res.status(200).json({
-            count: count,
-            followers: userFollowers,
-          });
-        }
-      } catch (err) {
-        res.status(500).json({
-          status: "failed",
-          data: err.message,
-        });
-      }
+    const userFollowers = await User.find(query).sort({
+      $natural: -1,
+      
     });
+    if (userFollowers.length === 0) {
+      res.status(404).json("There is any followers here");
+    } else {
+      const followerIds = userFollowers.map((follower) => follower._id); // Extracting only the IDs
+      res.status(200).json({count: followerIds.length,data: followerIds});
+    }
   } catch (err) {
     res.status(500).json({
-      status: "failed",
+      status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
       data: err.message,
     });
   }
@@ -279,7 +264,8 @@ const getUserFollowings = async (req, res) => {
     if (userFollowings.length === 0) {
       res.status(404).json("There is any following here");
     } else {
-      res.status(200).json(userFollowings);
+      const followingIds = userFollowings.map((following) => following._id); // Extracting only the IDs
+      res.status(200).json({count: followingIds.length,data: followingIds});
     }
   } catch (err) {
     res.status(500).json({
@@ -389,6 +375,24 @@ const checkUsername = async (req, res) => {
   }
 };
 
+const getUserAvatar = async (req, res)=>{
+  const {userId} = req.params;
+  try{
+    const user = await User.findById({ _id: userId });
+    if (!user) return res.status(400).json({ msg: "User does not exist." });
+
+    //
+    const avatarPath = path.join(__dirname, `../../${process.env.MULTER_TARGET_PATH}/${userId}.jpg`);
+
+    return res.status(200).sendFile(avatarPath);
+  }catch(err){
+    res.status(500).json({
+      status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      data: err.message,
+    });
+  }
+}
+
 /* UPDATE */
 const followUser = async (req, res) => {
   const { myId, userId } = req.params;
@@ -470,7 +474,9 @@ const uploadAvatar = async (req, res) => {
 
     //
     const tempPath = req.file.path;
-    const targetPath = path.join(__dirname, `../${process.env.MULTER_TARGET_PATH}/${userId}.jpg`);
+    const targetPath = path.join(__dirname, `../../${process.env.MULTER_TARGET_PATH}/${userId}.jpg`);
+
+    await User({profileImage: targetPath}).save();
 
     fs.rename(tempPath, targetPath, (err)=>{
       if(err){
@@ -518,9 +524,32 @@ const deleteUser = async (req, res) => {
   }
 };
 
+const deleteUserAvatar = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    // const { password } = req.body;
+    const user = await User.findById({ _id: userId });
+    if (!user) return res.status(400).json({ msg: "User does not exist." });
+
+    // const isMatch = await bcrypt.compare(password, user.password);
+    // if (!isMatch) return res.status(400).json({ msg: "Invalid credentials." });
+
+    const targetPath = path.join(__dirname, `../../${process.env.MULTER_TARGET_PATH}/${userId}.jpg`);
+    fs.unlinkSync(targetPath);
+
+    res.status(200).json({status: HTTP_STATUS.OK, data: "User Avatar Deleted!"});
+  } catch (err) {
+    res.status(500).json({
+      status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      data: err.message,
+    });
+  }
+};
+
 module.exports = {
   createUserToken,
   deleteUser,
+  deleteUserAvatar,
   updateUser,
   unfollowUser,
   followUser,
@@ -539,4 +568,5 @@ module.exports = {
   searchUsers,
   checkUsername,
   uploadAvatar,
+  getUserAvatar,
 };
