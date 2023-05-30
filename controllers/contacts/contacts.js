@@ -16,8 +16,8 @@ const createContact = async (req, res) => {
 
 const addContacts = async (req, res) => {
   try {
-    const { username } = req.body;
-    const user = await User.findOne({ username });
+    const { userId } = req.body;
+    const user = await User.findById( userId );
 
     if (user) {
       res.status(200).json({
