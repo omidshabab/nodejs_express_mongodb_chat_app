@@ -243,7 +243,7 @@ const loginUsername = async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({
-      status: "failed",
+      status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
       data: err.message,
     });
   }

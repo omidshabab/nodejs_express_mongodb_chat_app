@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const HTTP_STATUS = require("../config/status");
 
 const verifyAPIKey = async (req, res, next) => {
   try {
