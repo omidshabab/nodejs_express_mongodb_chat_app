@@ -3,7 +3,7 @@ const PeerToPeerChat = require("../../models/Chats/PeerToPeer");
 /* CREATE */
 
 /* READ */
-const getChats = async (req, res) => {
+const getPeerMessages = async (req, res) => {
   try {
     const { from, to } = req.body;
 
@@ -13,6 +13,12 @@ const getChats = async (req, res) => {
         { from: to, to: from },
       ],
     }).sort({ createdAt: 1 });
+
+    const messages = await PeerToPeerChat.find({
+      $where: {
+
+      },
+    })
 
     res.status(200).json({ chats });
   } catch (err) {
@@ -24,4 +30,6 @@ const getChats = async (req, res) => {
 
 /* DELETE */
 
-exports.module = { getChats };
+module.exports = {
+  getPeerMessages,
+};
