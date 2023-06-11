@@ -1,13 +1,18 @@
 const mongoose = require("mongoose");
 const { landinaChatDB } = require("../../config/database");
 
-const PeerToPeerChatSchema = new mongoose.Schema({
+const PeerChatSchema = new mongoose.Schema({
   between: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
   ],
+  senderId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
   messages: [
     {
       type: mongoose.Schema.Types.ObjectId,
@@ -20,8 +25,8 @@ const PeerToPeerChatSchema = new mongoose.Schema({
   },
 });
 
-const PeerToPeerChat = landinaChatDB.model(
-  "Peer-To-Peer",
-  PeerToPeerChatSchema
+const PeerChat = landinaChatDB.model(
+  "Peer",
+  PeerChatSchema
 );
-module.exports = PeerToPeerChat;
+module.exports = PeerChat;

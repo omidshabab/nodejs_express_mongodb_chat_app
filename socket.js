@@ -39,7 +39,22 @@ const connectSocket = (server) => {
     });
 
     connectedUsers.push(user);
-    console.log(`new socket connection (${user.username})`);
+    console.log(`new socket connection (${user.name}: ${user.username})`);
+
+    /* ONLINE */
+    socket.on("online", data => {
+      socket.broadcast.emit("online", data); // return data
+    });
+
+    /* UPLOADING */
+    socket.on("uploading", data => {
+      socket.broadcast.emit("uploading", data); // return data
+    });
+
+    /* TYPING */
+    socket.on("typing", data => {
+      socket.broadcast.emit("typing", data); // return data
+    });
 
     /* SEND MESSAGE ON PRIVATE CHAT */
     socket.on("send-message", async (event) => {
@@ -143,6 +158,12 @@ const connectSocket = (server) => {
           });
         }
       }
+    });
+
+    /* JOIN A ROOM CHAT */
+    socket.on("join-room", async (event) => {
+      socket.join(`ROOMID::${event.roomId}`);
+      console.log(`user ${user.userId} join to a room ${event.roomId}`);
     });
 
     /* JOIN A ROOM CHAT */
