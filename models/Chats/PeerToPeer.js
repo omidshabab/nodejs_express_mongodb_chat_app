@@ -8,21 +8,14 @@ const PeerChatSchema = new mongoose.Schema({
       ref: "User",
     },
   ],
-  senderId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
-  },
   messages: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Message",
     },
-  ],
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
+  ], 
+}, {
+  timestamps: true
 });
 
 const PeerChat = landinaChatDB.model(

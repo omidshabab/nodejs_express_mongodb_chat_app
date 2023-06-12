@@ -39,11 +39,23 @@ const connectSocket = (server) => {
     });
 
     connectedUsers.push(user);
-    console.log(`new socket connection (${user.name}: ${user.username})`);
+    console.log(`new socket connection (${user.username})`);
 
-    /* ONLINE */
-    socket.on("online", data => {
-      socket.broadcast.emit("online", data); // return data
+    /* USER STATUS */
+    socket.on("status", event => {
+      const filteredUsers = connectedUsers.filter(
+        (elem) => elem.userId == event.userId
+      );
+      
+      if (filteredUsers.length > 0) {
+        socket.emit("onUserStatus", {
+          status: "online"
+        });
+      } else {
+        socket.emit("onUserStatus", {
+          status: "offline"
+        });
+      }
     });
 
     /* UPLOADING */
@@ -138,6 +150,21 @@ const connectSocket = (server) => {
           );
           console.log(`New to user chat saved`);
         }
+
+        const filteredUsers = connectedUsers.filter(
+          (elem) => elem.userId == event.to
+        );
+        
+        filteredUsers.forEach((socketItem) => {
+          socket.broadcast.to(socketItem.socketId).emit("onPeerMessage", {
+            message: event.message,
+            from: user,
+          });
+          console.log(
+            `user ${user.userId} sent a message to ${socketItem.socketId} > ${event.message}`
+          );
+        });
+        
       } else if (!!event.botId) {
         //
       } else if (!!event.onewayId) {
@@ -148,7 +175,7 @@ const connectSocket = (server) => {
         );
         if (filteredUsers.length > 0) {
           filteredUsers.forEach((socketItem) => {
-            socket.broadcast.to(socketItem.socketId).emit("onMessage", {
+            socket.broadcast.to(socketItem.socketId).emit("onPrivateMessage", {
               message: event.message,
               from: user,
             });
@@ -156,6 +183,11 @@ const connectSocket = (server) => {
               `user ${user.userId} sent a message to ${socketItem.socketId} > ${event.message}`
             );
           });
+        } else {
+          // OFFLINE MESSAGES
+          console.log(
+            `user ${user.userId} sent a offline message to ${event.to} > ${event.message}`
+          );
         }
       }
     });
@@ -180,9 +212,15 @@ const connectSocket = (server) => {
 
     /* DISCONNECT */
     socket.on("disconnect", (event) => {
+      
+      const deleteUserIndex = connectedUsers.findIndex((elem) => elem.userId === user.userId)
+      connectedUsers.splice(deleteUserIndex, 1);
+
       console.log(`user (${user.username}) disconnected`);
-      const index = connectedUsers.indexOf((elem) => elem.userId === userId);
-      connectedUsers.slice(index, 1);
+
+      for(i=0; i<connectedUsers.length; i++){
+        console.log(`(${connectedUsers[i].userId})`)
+      }
     });
   });
 };
