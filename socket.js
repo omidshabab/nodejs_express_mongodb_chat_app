@@ -159,6 +159,7 @@ const connectSocket = (server) => {
           socket.broadcast.to(socketItem.socketId).emit("onPeerMessage", {
             message: event.message,
             from: user,
+            type: peer,
           });
           console.log(
             `user ${user.userId} sent a message to ${socketItem.socketId} > ${event.message}`
