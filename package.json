@@ -1,5 +1,5 @@
 {
-  "name": "landina_account",
+  "name": "nodejs_express_mongodb_chat_app",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
